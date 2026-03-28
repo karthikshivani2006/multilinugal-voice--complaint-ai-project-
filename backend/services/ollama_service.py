@@ -1,48 +1,57 @@
+"""
+Ollama-based LLM service for voice-mode AI chat responses.
+Uses a local Ollama instance (llama2) as a drop-in alternative to Gemini.
+"""
+
 import json
-from pathlib import Path
+import requests
 
-import google.generativeai as genai
-
-from config import settings
 from utils.constants import COMPLAINT_TYPES, REQUIRED_COMPLAINT_FIELDS, SUPPORTED_LANGUAGES
 
 
-class GeminiService:
+OLLAMA_BASE_URL = "http://localhost:11434"
+# Prefer smaller/faster models first; fall back to larger ones
+OLLAMA_MODEL_PREFERENCE = ["phi3:mini", "phi3", "phi", "mistral", "llama2", "codellama"]
+
+
+class OllamaService:
     def __init__(self) -> None:
-        genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel(self._pick_model_name())
+        self.base_url = OLLAMA_BASE_URL
+        self.model = self._pick_model()
 
-    def _pick_model_name(self) -> str:
-        preferred = [
-            "gemini-2.0-flash",
-            "gemini-1.5-flash-latest",
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-8b",
-        ]
+    def _pick_model(self) -> str:
+        """Return the fastest available model from the preference list."""
         try:
-            available = [m.name.split("models/")[-1] for m in genai.list_models() if "generateContent" in m.supported_generation_methods]
-            for candidate in preferred:
-                if candidate in available:
-                    return candidate
-            if available:
-                return available[0]
-        except Exception as e:
-            print(f"Error picking model: {e}")
-            pass
-        return "gemini-1.5-flash-latest"
+            resp = requests.get(f"{self.base_url}/api/tags", timeout=3)
+            resp.raise_for_status()
+            available = [m["name"] for m in resp.json().get("models", [])]
+            print(f"[ollama] Available models: {available}")
+            for preferred in OLLAMA_MODEL_PREFERENCE:
+                for avail in available:
+                    if preferred in avail:
+                        print(f"[ollama] Selected model: {avail}")
+                        return avail
+            return available[0] if available else "llama2"
+        except Exception:
+            return "llama2"
 
-    def _generate_with_retry(self, prompt: str | list, retries: int = 3) -> str:
+    def _generate(self, prompt: str, retries: int = 2) -> str:
         import time
         for i in range(retries):
             try:
-                response = self.model.generate_content(prompt)
-                return response.text or ""
+                resp = requests.post(
+                    f"{self.base_url}/api/generate",
+                    json={"model": self.model, "prompt": prompt, "stream": False},
+                    timeout=180,  # 3 minutes — CPU inference can be slow
+                )
+                resp.raise_for_status()
+                return resp.json().get("response", "")
             except Exception as e:
                 err_str = str(e).lower()
-                if ("429" in err_str or "rate_limit" in err_str or "quota" in err_str) and i < retries - 1:
-                    time.sleep(2 ** i) # Exponential backoff
+                if i < retries - 1 and "timeout" not in err_str:
+                    time.sleep(1)
                     continue
-                print(f"Gemini API Error: {e}")
+                print(f"Ollama API Error: {e}")
                 return ""
         return ""
 
@@ -50,10 +59,25 @@ class GeminiService:
         text = text.strip()
         if text.startswith("```"):
             text = text.replace("```json", "").replace("```", "").strip()
+        # Try to extract JSON from surrounding text
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        if start >= 0 and end > start:
+            text = text[start:end]
         try:
             return json.loads(text)
         except json.JSONDecodeError:
             return {}
+
+    def is_available(self) -> bool:
+        """Check if Ollama is running and the model is available."""
+        try:
+            resp = requests.get(f"{self.base_url}/api/tags", timeout=3)
+            resp.raise_for_status()
+            models = [m["name"] for m in resp.json().get("models", [])]
+            return any(self.model in m for m in models)
+        except Exception:
+            return False
 
     def detect_language(self, text: str) -> str:
         prompt = (
@@ -62,8 +86,7 @@ class GeminiService:
             "Return only one language name, no extra words.\n\n"
             f"Text: {text}"
         )
-        response_text = self._generate_with_retry(prompt)
-        guess = (response_text or "English").strip()
+        guess = (self._generate(prompt) or "English").strip()
         return guess if guess in SUPPORTED_LANGUAGES else "English"
 
     def translate_text(self, text: str, target_language: str) -> str:
@@ -71,14 +94,10 @@ class GeminiService:
             return text
         prompt = (
             f"Translate the following text to {target_language}. "
-            "Keep meaning exact, simple, and natural for Indian users.\n\n"
+            "Keep meaning exact, simple, and natural.\n\n"
             f"Text: {text}"
         )
-        response_text = self._generate_with_retry(prompt)
-        return (response_text or "").strip()
-
-    def to_english(self, text: str) -> str:
-        return self.translate_text(text, "English")
+        return (self._generate(prompt) or "").strip()
 
     def generate_complaint_chat_reply(
         self,
@@ -131,7 +150,7 @@ User said: "{user_message}"
 
 Return ONLY valid JSON, no extra text:
 """
-        response_text = self._generate_with_retry(prompt)
+        response_text = self._generate(prompt)
         payload = self._safe_json_parse(response_text or "")
         if not payload:
             return {
@@ -143,35 +162,9 @@ Return ONLY valid JSON, no extra text:
             }
         return payload
 
-    def analyze_evidence(self, file_path: str, mime_type: str) -> str:
-        prompt = (
-            "Extract all meaningful text and cyber-crime-relevant details from this file. "
-            "Return plain text summary with names, accounts, UTR, links, timestamps, and suspicious indicators if present."
-        )
-
-        path = Path(file_path)
-        if not path.exists():
-            return ""
-
-        uploaded = genai.upload_file(path=str(path), mime_type=mime_type)
-        response = self.model.generate_content([prompt, uploaded])
-        return (response.text or "").strip()
-
     def transcribe_audio(self, file_path: str, mime_type: str) -> str:
-        """Transcribe spoken audio/video to text using Gemini multimodal."""
-        prompt = (
-            "Transcribe the spoken content in this audio/video file exactly as spoken. "
-            "Return only the transcription text, nothing else. "
-            "If the audio is in a regional Indian language, transcribe it faithfully in that language."
-        )
-
-        path = Path(file_path)
-        if not path.exists():
-            return ""
-
-        uploaded = genai.upload_file(path=str(path), mime_type=mime_type)
-        response = self.model.generate_content([prompt, uploaded])
-        return (response.text or "").strip()
+        """Ollama doesn't support audio natively — return empty."""
+        return ""
 
 
-gemini_service = GeminiService()
+ollama_service = OllamaService()

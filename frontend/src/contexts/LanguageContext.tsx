@@ -54,7 +54,7 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLang] = useState<Language>(LANGUAGES.find((lang) => lang.code === "en") || LANGUAGES[0]);
-  const [isLanguageSelected, setIsLanguageSelected] = useState(false);
+  const [isLanguageSelected, setIsLanguageSelected] = useState(true);
 
   const setLanguage = useCallback((lang: Language) => {
     setLang(lang);

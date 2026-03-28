@@ -45,7 +45,7 @@ def speech_to_text(file: UploadFile = File(...)):
         out.write(temp_bytes)
 
     mime_type = file.content_type or mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
-    text = gemini_service.analyze_evidence(temp_path, mime_type)
+    text = gemini_service.transcribe_audio(temp_path, mime_type)
 
     return {"transcript": text}
 

@@ -1,82 +1,145 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 /**
- * Hook for Speech-to-Text using Web Speech API.
- * Falls back gracefully if browser doesn't support it.
+ * ChatGPT-style voice hook.
+ *  - Click once → stays listening (auto-restarts after each utterance).
+ *  - When browser fires `onend` (silence detected), transcript is sent via onSilence().
+ *  - Mic pauses during TTS / AI thinking, resumes after.
+ *  - Click again → stops entirely.
  */
-export function useSpeechToText() {
+export function useSpeechToText(onSilence?: (text: string) => void) {
   const { language } = useLanguage();
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef<any>(null);
+  const [interimText, setInterimText] = useState("");
 
-  const startListening = useCallback(() => {
+  const recognitionRef = useRef<any>(null);
+  const activeRef = useRef(false);         // true while voice mode is on
+  const onSilenceRef = useRef(onSilence);  // always latest callback
+  const finalRef = useRef("");             // accumulated final transcript
+
+  // Keep the callback ref in sync
+  useEffect(() => { onSilenceRef.current = onSilence; }, [onSilence]);
+
+  const startSession = useCallback(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      console.warn("Speech Recognition not supported in this browser");
-      return;
-    }
+    if (!SpeechRecognition || !activeRef.current) return;
 
     const recognition = new SpeechRecognition();
     recognition.lang = language.speechCode;
     recognition.interimResults = true;
-    recognition.continuous = true;
+    recognition.continuous = false; // browser handles silence → fires onend
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+    finalRef.current = "";
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setInterimText("");
+    };
 
     recognition.onresult = (event: any) => {
-      let final = "";
-      for (let i = 0; i < event.results.length; i++) {
-        final += event.results[i][0].transcript;
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalRef.current = (finalRef.current + " " + t).trim();
+        } else {
+          interim = t;
+        }
       }
-      setTranscript(final);
+      setInterimText(interim || finalRef.current);
     };
 
     recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
-      setIsListening(false);
+      if (event.error !== "no-speech" && event.error !== "aborted") {
+        console.error("Speech error:", event.error);
+      }
     };
 
     recognition.onend = () => {
       setIsListening(false);
+      setInterimText("");
+
+      const text = finalRef.current.trim();
+      finalRef.current = "";
+
+      // Fire the callback with whatever was captured
+      if (text && onSilenceRef.current && activeRef.current) {
+        onSilenceRef.current(text);
+        // Don't restart until the caller signals it's ready (via resumeListening)
+        return;
+      }
+
+      // No text (noise / no-speech): immediately restart
+      if (activeRef.current) {
+        setTimeout(() => {
+          if (activeRef.current) startSession();
+        }, 100);
+      }
     };
 
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
+    try {
+      recognition.start();
+    } catch (e) {
+      // Already started — ignore
+    }
   }, [language.speechCode]);
 
+  const startListening = useCallback(() => {
+    activeRef.current = true;
+    startSession();
+  }, [startSession]);
+
   const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
+    activeRef.current = false;
+    recognitionRef.current?.abort();
+    setIsListening(false);
+    setInterimText("");
+    finalRef.current = "";
+  }, []);
+
+  const pauseListening = useCallback(() => {
+    recognitionRef.current?.abort();
     setIsListening(false);
   }, []);
 
-  const resetTranscript = useCallback(() => setTranscript(""), []);
+  const resumeListening = useCallback(() => {
+    if (activeRef.current) {
+      setTimeout(() => {
+        if (activeRef.current) startSession();
+      }, 400);
+    }
+  }, [startSession]);
 
-  return { isListening, transcript, startListening, stopListening, resetTranscript };
+  useEffect(() => {
+    return () => {
+      activeRef.current = false;
+      recognitionRef.current?.abort();
+    };
+  }, []);
+
+  return { isListening, interimText, startListening, stopListening, pauseListening, resumeListening };
 }
 
 /**
- * Hook for Text-to-Speech using Web Speech API.
+ * Text-to-Speech — calls onEnd when finished.
  */
 export function useTextToSpeech() {
   const { language } = useLanguage();
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const speak = useCallback(
-    (text: string, overrideLang?: string) => {
-      if (!window.speechSynthesis) {
-        console.warn("Speech Synthesis not supported");
-        return;
-      }
+    (text: string, overrideLang?: string, onEnd?: () => void) => {
+      if (!window.speechSynthesis) { onEnd?.(); return; }
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = overrideLang || language.speechCode;
-      utterance.rate = 0.9;
+      utterance.rate = 0.95;
       utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      utterance.onend = () => { setIsSpeaking(false); onEnd?.(); };
+      utterance.onerror = () => { setIsSpeaking(false); onEnd?.(); };
       window.speechSynthesis.speak(utterance);
     },
     [language.speechCode]

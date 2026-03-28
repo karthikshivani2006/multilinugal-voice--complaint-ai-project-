@@ -8,15 +8,15 @@ import { Send, Upload, CheckCircle, Volume2 } from "lucide-react";
 
 export default function ComplaintPage() {
   const { t, language, setLanguage, isLanguageSelected } = useLanguage();
-  const { isListening, transcript, startListening, stopListening, resetTranscript } = useSpeechToText();
-  const { speak, isSpeaking, stop: stopSpeaking } = useTextToSpeech();
-  const [isContinuousMode, setIsContinuousMode] = useState(false);
 
   // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  // Always read the latest messages from a ref to avoid stale closures
+  const messagesRef = useRef<ChatMessage[]>([]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   // Form state
   const [form, setForm] = useState<ComplaintFormData>({
@@ -33,49 +33,46 @@ export default function ComplaintPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  // Voice mode state
+  const [voiceActive, setVoiceActive] = useState(false); // is mic toggled ON?
+
   const isFormValid = Boolean(
-    form.fullName &&
-      form.phone &&
-      form.email &&
-      form.address &&
-      form.incidentType &&
-      form.dateTime &&
-      form.description &&
-      form.platform
+    form.fullName && form.phone && form.email && form.address &&
+    form.incidentType && form.dateTime && form.description && form.platform
   );
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // When user stops speaking, send transcript
-  useEffect(() => {
-    if (!isListening && transcript) {
-      setInputText(transcript);
-      resetTranscript();
-      // If continuous mode is on, submitting the transcript should immediately show loading
-      // The sendMessage call is handled by useEffect or manual button. Wait, actually we rely on 'sendMessage' being called directly?
-      // Currently, it just sets inputText and clears transcript. Wait, how was it sending before?
-      // Ah! It wasn't sending! The user had to click "Submit" button! Oh!
-    }
-  }, [isListening, transcript, resetTranscript]);
+  // ─── Core send + voice loop ─────────────────────────────────────────
+  // Forward declared as refs so the voice callbacks can always reference the latest
+  const sendMessageRef = useRef<((text: string) => Promise<void>) | null>(null);
 
-  // If continuous mode is on, and we have input text, we should probably auto-send it
-  useEffect(() => {
-    if (isContinuousMode && inputText && !isListening && !isSpeaking) {
-      sendMessage(inputText);
-    }
-  }, [isContinuousMode, inputText, isListening, isSpeaking]);
+  const { speak, isSpeaking, stop: stopSpeaking } = useTextToSpeech();
 
-  // Auto-resume listening if continuous mode is active
-  useEffect(() => {
-    if (isContinuousMode && !isSpeaking && !isListening && !chatLoading && !inputText) {
-      const timer = setTimeout(() => {
-        startListening();
-      }, 500); // tiny delay ensures TTS completely releases the audio interface
-      return () => clearTimeout(timer);
-    }
-  }, [isContinuousMode, isSpeaking, isListening, chatLoading, inputText, startListening]);
+  // onSilence is called by useSpeechToText when the user pauses speaking
+  const onSilence = useCallback((text: string) => {
+    sendMessageRef.current?.(text);
+  }, []);
+
+  const {
+    isListening,
+    interimText,
+    startListening,
+    stopListening,
+    pauseListening,
+    resumeListening,
+  } = useSpeechToText(voiceActive ? onSilence : undefined);
+
+
+  // Keep refs so sendMessage can always read latest values without stale closures
+  const voiceActiveRef = useRef(false);
+  useEffect(() => { voiceActiveRef.current = voiceActive; }, [voiceActive]);
+  const resumeListeningRef = useRef(resumeListening);
+  useEffect(() => { resumeListeningRef.current = resumeListening; }, [resumeListening]);
+  // Note: mic pausing/resuming is driven entirely by the speak() onEnd callback
+  // and onSilence — no useEffect needed here (they caused chatLoading to get stuck).
 
   const applyCollectedFields = useCallback((fields?: Record<string, string>) => {
     if (!fields || Object.keys(fields).length === 0) return;
@@ -98,74 +95,7 @@ export default function ComplaintPage() {
     }));
   }, []);
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim()) return;
-    const userMsg: ChatMessage = { role: "user", content: text.trim() };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    setInputText("");
-
-    // --- Voice Input Sequence: hlo -> choose language -> converse ---
-    if (!isLanguageSelected || text.toLowerCase() === "hlo" || text.toLowerCase() === "hello") {
-      // Check if the user is specifying a language
-      const matchedLang = LANGUAGES.find((l: any) => text.toLowerCase().includes(l.name.toLowerCase()) || text.includes(l.nativeName));
-      
-      if (matchedLang) {
-         // User selected a language!
-         setLanguage(matchedLang);
-         
-         // Trigger the AI to start conversing in that language
-         setChatLoading(true);
-         try {
-           const apiRes = await sendChatMessage(newMessages, matchedLang.code);
-           setMessages((prev) => [...prev, { role: "assistant", content: apiRes.response }]);
-           applyCollectedFields(apiRes.collected_fields);
-           
-           // We use the updated speak hook that safely overrides the context language code
-           // and guarantees the isSpeaking state triggers automatically
-           speak(apiRes.response, matchedLang.speechCode);
-         } catch {
-           setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, error." }]);
-         }
-         setChatLoading(false);
-         return;
-      } else {
-         // Step 2: "choose your language"
-         const reply = "Please choose your language. For example: English, Hindi, or Tamil.";
-         setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
-         speak(reply);
-          return;
-      }
-    }
-
-    // --- Voice Submission Trigger ---
-    const submitRegex = /submit|file|confirm|register|submit the form|file my complaint/i;
-    if (submitRegex.test(text.toLowerCase()) && isFormValid) {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Understood. Submitting your complaint now..." }]);
-      speak("Understood. Submitting your complaint now.");
-      handleSubmit();
-      return;
-    } else if (submitRegex.test(text.toLowerCase()) && !isFormValid) {
-       const missingFieldsReply = "I'm ready to submit, but some required fields are still missing. Please provide your full name, incident details, and the platform where it happened.";
-       setMessages((prev) => [...prev, { role: "assistant", content: missingFieldsReply }]);
-       speak(missingFieldsReply);
-       return;
-    }
-
-    setChatLoading(true);
-
-    try {
-      const apiRes = await sendChatMessage(newMessages, language.name);
-      setMessages((prev) => [...prev, { role: "assistant", content: apiRes.response }]);
-      applyCollectedFields(apiRes.collected_fields);
-      speak(apiRes.response);
-    } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: t("sorryError") }]);
-    }
-    setChatLoading(false);
-  }, [messages, language.name, isLanguageSelected, speak, applyCollectedFields, handleSubmit, isFormValid]);
-
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setSubmitError("");
     setSubmitting(true);
     try {
@@ -178,7 +108,100 @@ export default function ComplaintPage() {
       setSubmitError(message);
     }
     setSubmitting(false);
-  };
+  }, [form, evidenceFiles, idFiles, language.code, speak, t]);
+
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || chatLoading) return;
+
+    const currentMessages = messagesRef.current;
+    const userMsg: ChatMessage = { role: "user", content: text.trim() };
+    const newMessages = [...currentMessages, userMsg];
+    setMessages(newMessages);
+    messagesRef.current = newMessages;
+    setInputText("");
+
+    const resumeIfVoice = () => {
+      if (voiceActiveRef.current) resumeListeningRef.current?.();
+    };
+
+    // Language selection
+    if (!isLanguageSelected) {
+      const matchedLang = LANGUAGES.find(
+        (l: any) => text.toLowerCase().includes(l.name.toLowerCase()) || text.includes(l.nativeName)
+      );
+      if (matchedLang) {
+        setLanguage(matchedLang);
+        setChatLoading(true);
+        try {
+          const apiRes = await sendChatMessage(newMessages, matchedLang.name);
+          const assistantMsg: ChatMessage = { role: "assistant", content: apiRes.response };
+          setMessages((prev) => [...prev, assistantMsg]);
+          messagesRef.current = [...newMessages, assistantMsg];
+          applyCollectedFields(apiRes.collected_fields);
+          speak(apiRes.response, matchedLang.speechCode, resumeIfVoice);
+        } catch {
+          setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, an error occurred." }]);
+          resumeIfVoice();
+        } finally {
+          setChatLoading(false);
+        }
+        return;
+      } else {
+        const reply = "Please choose your language. For example: English, Hindi, or Tamil.";
+        setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+        speak(reply, undefined, resumeIfVoice);
+        return;
+      }
+    }
+
+    // Submit trigger via voice
+    const submitRegex = /^(submit|file|confirm|register|submit the form|file my complaint)$/i;
+    if (submitRegex.test(text.trim()) && isFormValid) {
+      const reply = "Understood. Submitting your complaint now.";
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+      speak(reply, undefined, resumeIfVoice);
+      handleSubmit();
+      return;
+    } else if (submitRegex.test(text.trim()) && !isFormValid) {
+      const reply = "Some required fields are still missing. Please describe your full name, what happened, and the platform.";
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+      speak(reply, undefined, resumeIfVoice);
+      return;
+    }
+
+    // Normal AI chat
+    setChatLoading(true);
+    try {
+      const apiRes = await sendChatMessage(newMessages, language.name);
+      const assistantMsg: ChatMessage = { role: "assistant", content: apiRes.response };
+      setMessages((prev) => [...prev, assistantMsg]);
+      messagesRef.current = [...newMessages, assistantMsg];
+      applyCollectedFields(apiRes.collected_fields);
+      speak(apiRes.response, undefined, resumeIfVoice);
+    } catch {
+      setMessages((prev) => [...prev, { role: "assistant", content: t("sorryError") }]);
+      resumeIfVoice();
+    } finally {
+      setChatLoading(false);
+    }
+  }, [chatLoading, language.name, isLanguageSelected, speak, applyCollectedFields, t, isFormValid, handleSubmit, setLanguage]);
+
+  // Keep the ref in sync so onSilence always calls the latest sendMessage
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [sendMessage]);
+
+  // Toggle voice mode
+  const toggleVoice = useCallback(() => {
+    if (voiceActive) {
+      setVoiceActive(false);
+      stopListening();
+      stopSpeaking();
+    } else {
+      setVoiceActive(true);
+      startListening();
+    }
+  }, [voiceActive, stopListening, stopSpeaking, startListening]);
 
   const updateForm = (field: keyof ComplaintFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -201,6 +224,16 @@ export default function ComplaintPage() {
     );
   }
 
+  const micLabel = voiceActive
+    ? isListening
+      ? "🔴 Listening..."
+      : isSpeaking
+      ? "🔊 AI Speaking..."
+      : chatLoading
+      ? "⏳ Thinking..."
+      : "🎙 Voice On"
+    : t("speakNow");
+
   return (
     <div className="min-h-[calc(100vh-120px)] max-w-[1400px] mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6 animate-reveal-up">{t("fileComplaint")}</h1>
@@ -208,33 +241,65 @@ export default function ComplaintPage() {
       <div className="grid lg:grid-cols-[auto_1fr_1fr] gap-6">
         {/* LEFT: Mic */}
         <div className="flex lg:flex-col items-center gap-4 animate-reveal-up" style={{ animationDelay: "80ms" }}>
-          <MicButton
-            isListening={isListening || isContinuousMode}
-            onToggle={() => {
-              if (isContinuousMode || isListening) {
-                setIsContinuousMode(false);
-                stopListening();
-                stopSpeaking();
-              } else {
-                setIsContinuousMode(true);
-                startListening();
-              }
-            }}
-            size="lg"
-          />
-          <p className="text-xs text-muted-foreground text-center">
-            {isContinuousMode ? t("listening") + " (Continuous)" : isListening ? t("listening") : t("speakNow")}
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <MicButton
+              isListening={voiceActive}
+              onToggle={toggleVoice}
+              size="lg"
+            />
+            <p className="text-xs text-muted-foreground text-center max-w-[80px] leading-tight">
+              {micLabel}
+            </p>
+          </div>
+          {voiceActive && (
+            <div className="flex flex-col items-center gap-1 mt-1">
+              <div className="flex gap-0.5 items-end h-5">
+                {[1,2,3,4,5].map((i) => (
+                  <div
+                    key={i}
+                    className={`w-1 rounded-full transition-all duration-150 ${
+                      isListening ? "bg-destructive" : "bg-muted-foreground/30"
+                    }`}
+                    style={{
+                      height: isListening ? `${8 + Math.random() * 12}px` : "4px",
+                      animationDelay: `${i * 80}ms`,
+                    }}
+                  />
+                ))}
+              </div>
+              {interimText && (
+                <p className="text-xs text-muted-foreground italic max-w-[100px] truncate" title={interimText}>
+                  "{interimText}"
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* CENTER: Chat */}
         <div className="bg-card rounded-xl shadow-sm border border-border flex flex-col h-[600px] animate-reveal-up" style={{ animationDelay: "160ms" }}>
-          <div className="px-4 py-3 border-b border-border bg-muted/50 rounded-t-xl">
-            <h2 className="text-sm font-semibold">{t("aiAssistant")}</h2>
-            <p className="text-xs text-muted-foreground">{t("conversationIn")} {language.nativeName}</p>
+          <div className="px-4 py-3 border-b border-border bg-muted/50 rounded-t-xl flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold">{t("aiAssistant")}</h2>
+              <p className="text-xs text-muted-foreground">{t("conversationIn")} {language.nativeName}</p>
+            </div>
+            {voiceActive && (
+              <span className="text-xs bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium animate-pulse">
+                Voice Active
+              </span>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.length === 0 && (
+              <div className="flex justify-start">
+                <div className="bg-muted px-4 py-3 rounded-xl rounded-bl-sm text-sm text-muted-foreground max-w-[80%]">
+                  {voiceActive
+                    ? "🎙 Voice mode active! Speak and I'll respond automatically."
+                    : "Hello! Click the mic to use voice mode, or type your message below. How can I help you?"}
+                </div>
+              </div>
+            )}
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -278,15 +343,15 @@ export default function ComplaintPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={inputText}
+                value={interimText || inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage(inputText)}
-                placeholder={t("speakNow")}
+                placeholder={voiceActive ? "🎙 Speak now — or type here too" : t("speakNow")}
                 className="flex-1 px-4 py-2 rounded-lg border border-input bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none"
               />
               <button
                 onClick={() => sendMessage(inputText)}
-                disabled={!inputText.trim() || chatLoading}
+                disabled={(!inputText.trim() && !interimText) || chatLoading}
                 className="p-2 rounded-lg bg-accent text-accent-foreground hover:opacity-90 disabled:opacity-40 active:scale-95 transition-all"
               >
                 <Send size={18} />
@@ -345,7 +410,6 @@ export default function ComplaintPage() {
               </select>
             </div>
 
-            {/* File uploads */}
             <FileUpload
               label={t("uploadEvidence")}
               hint={t("evidenceHint")}

@@ -305,21 +305,31 @@ export async function sendChatMessage(
 ): Promise<{ response: string; collected_fields?: Record<string, string> }> {
   const lastMsg = messages[messages.length - 1]?.content || "";
 
+  // Use a 3-minute timeout so slow local LLM (Ollama) has time to respond
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 180_000);
+
   try {
     const response = await fetchJson<{ response: string; collected_fields: Record<string, string> }>(`${BASE_URL}/chat`, {
       method: "POST",
+      signal: controller.signal,
       body: JSON.stringify({
         session_id: getSessionId(),
         language,
         message: lastMsg,
       }),
     });
+    clearTimeout(timeoutId);
     return { response: response.response, collected_fields: response.collected_fields };
-  } catch {
-    if (messages.length <= 1) {
-      return { response: "I can help you file a complaint. Please start with your full name." };
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err?.name === "AbortError") {
+      return { response: "The AI is taking longer than usual. Please try again in a moment." };
     }
-    return { response: "AI service is temporarily unavailable. Please continue entering details in the form and submit." };
+    if (messages.length <= 1) {
+      return { response: "I can help you file a complaint. Please tell me what happened." };
+    }
+    return { response: "I'm having trouble connecting to the AI. Please try again." };
   }
 }
 

@@ -5,6 +5,7 @@ from database import get_db
 from schemas.chat import ChatRequest, ChatResponse
 from services.conversation_service import conversation_service
 from services.gemini_service import gemini_service
+from services.ollama_service import ollama_service
 from services.translation_service import translation_service
 from utils.constants import REQUIRED_COMPLAINT_FIELDS, SUPPORTED_LANGUAGES, UNKNOWN_INPUT_HINTS
 
@@ -13,7 +14,9 @@ router = APIRouter(prefix="/chat", tags=["Chat"])
 
 
 @router.post("", response_model=ChatResponse)
-def chat_with_assistant(payload: ChatRequest, db: Session = Depends(get_db)):
+async def chat_with_assistant(payload: ChatRequest, db: Session = Depends(get_db)):
+    import asyncio
+
     session = conversation_service.get_or_create(db, payload.session_id)
 
     if not payload.language and not session.messages:
@@ -34,12 +37,38 @@ def chat_with_assistant(payload: ChatRequest, db: Session = Depends(get_db)):
 
     conversation_service.add_message(db, session, role="user", content=payload.message)
 
-    llm_payload = gemini_service.generate_complaint_chat_reply(
-        user_language=language,
-        user_message=payload.message,
-        conversation_messages=session.messages,
-        collected_fields=session.collected_fields or {},
-    )
+    # Try Ollama first (in a thread so it doesn't block the event loop).
+    # If Ollama times out or is unavailable, fall back to Gemini.
+    llm_payload = None
+    if ollama_service.is_available():
+        print(f"[chat] Trying Ollama ({ollama_service.model}) ...")
+        try:
+            llm_payload = await asyncio.wait_for(
+                asyncio.to_thread(
+                    ollama_service.generate_complaint_chat_reply,
+                    language,
+                    payload.message,
+                    session.messages,
+                    session.collected_fields or {},
+                ),
+                timeout=120,  # 2-minute hard cap per request
+            )
+        except asyncio.TimeoutError:
+            print("[chat] Ollama timed out — falling back to Gemini")
+            llm_payload = None
+        except Exception as e:
+            print(f"[chat] Ollama error: {e} — falling back to Gemini")
+            llm_payload = None
+
+    if llm_payload is None:
+        print("[chat] Using Gemini")
+        llm_payload = await asyncio.to_thread(
+            gemini_service.generate_complaint_chat_reply,
+            language,
+            payload.message,
+            session.messages,
+            session.collected_fields or {},
+        )
 
     field_updates = llm_payload.get("field_updates", {})
     intent = llm_payload.get("intent")
@@ -70,3 +99,4 @@ def chat_with_assistant(payload: ChatRequest, db: Session = Depends(get_db)):
         collected_fields=session.collected_fields,
         missing_fields=missing_fields,
     )
+
