@@ -1,4 +1,14 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8010";
+
+function getFallbackUrl(url: string): string | null {
+  if (url.includes(":8000")) {
+    return url.replace(":8000", ":8010");
+  }
+  if (url.includes(":8010")) {
+    return url.replace(":8010", ":8000");
+  }
+  return null;
+}
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -48,7 +58,10 @@ export interface AdminComplaint {
   filedDate: string;
   language: string;
   amountLost?: string;
+  transactionId?: string;
   platform?: string;
+  suspectDetails?: string;
+  dateTime?: string;
   suspectVpa?: string;
   suspectPhone?: string;
   suspectBankAccount?: string;
@@ -57,7 +70,25 @@ export interface AdminComplaint {
     filePath: string;
     fileUrl: string;
     extractedText?: string;
+    extractedTextOriginal?: string;
   }>;
+}
+
+export interface IdProofValidationResult {
+  mismatchFields: string[];
+  proceedRecommended: boolean;
+  analysis: {
+    document_type?: string;
+    name?: string;
+    id_number?: string;
+    dob?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    confidence?: string;
+    notes?: string;
+    extracted_text?: string;
+  };
 }
 
 export interface LoginCredentials {
@@ -89,6 +120,11 @@ interface BackendAdminComplaint {
   status: "pending" | "reviewing" | "resolved";
   language: string;
   created_at: string;
+  amount_lost?: string;
+  transaction_id?: string;
+  platform?: string;
+  suspect_details?: string;
+  date_time?: string;
   suspect_vpa?: string;
   suspect_phone?: string;
   suspect_bank_account?: string;
@@ -96,7 +132,25 @@ interface BackendAdminComplaint {
     file_path: string;
     file_url: string;
     extracted_text?: string;
+    extracted_text_original?: string;
   }>;
+}
+
+interface BackendIdValidationResult {
+  mismatch_fields: string[];
+  proceed_recommended: boolean;
+  analysis: {
+    document_type?: string;
+    name?: string;
+    id_number?: string;
+    dob?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    confidence?: string;
+    notes?: string;
+    extracted_text?: string;
+  };
 }
 
 function getSessionId() {
@@ -106,6 +160,11 @@ function getSessionId() {
   const generated = `sess-${crypto.randomUUID()}`;
   localStorage.setItem(key, generated);
   return generated;
+}
+
+export function resetChatSession() {
+  const key = "cyberguard_session_id";
+  localStorage.setItem(key, `sess-${crypto.randomUUID()}`);
 }
 
 function adminAuthHeaders() {
@@ -123,14 +182,46 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
     headers["Content-Type"] = "application/json";
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  const doFetch = (targetUrl: string) =>
+    fetch(targetUrl, {
+      ...options,
+      headers,
+    });
+
+  let response: Response;
+  try {
+    response = await doFetch(url);
+  } catch (primaryError) {
+    const fallbackUrl = getFallbackUrl(url);
+    if (!fallbackUrl) {
+      throw primaryError;
+    }
+    response = await doFetch(fallbackUrl);
+  }
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(body || `HTTP ${response.status}`);
+    let message = body || `HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(body);
+      if (Array.isArray(parsed?.detail)) {
+        message = parsed.detail
+          .map((item: any) => {
+            if (typeof item === "string") return item;
+            if (item && typeof item.msg === "string") {
+              const loc = Array.isArray(item.loc) ? item.loc.join(".") : "field";
+              return `${loc}: ${item.msg}`;
+            }
+            return "Validation error";
+          })
+          .join("; ");
+      } else if (typeof parsed?.detail === "string") {
+        message = parsed.detail;
+      }
+    } catch {
+      // Keep raw response body when it is not JSON.
+    }
+    throw new Error(message);
   }
 
   return response.json() as Promise<T>;
@@ -143,7 +234,7 @@ export async function submitComplaint(data: ComplaintFormData): Promise<Complain
   const payload = {
     full_name: data.fullName,
     phone_number: data.phone,
-    email: data.email,
+    email: !data.email || ["n/a", "na", "none", "skip"].includes(data.email.trim().toLowerCase()) ? null : data.email,
     address: data.address,
     complaint_type: data.incidentType,
     date_time: data.dateTime,
@@ -190,6 +281,26 @@ export async function submitComplaint(data: ComplaintFormData): Promise<Complain
     ticketId: created.ticket_id,
     status: created.status,
     message: created.message,
+  };
+}
+
+export async function validateIdProof(data: ComplaintFormData, file: File): Promise<IdProofValidationResult> {
+  const form = new FormData();
+  form.append("full_name", data.fullName || "");
+  form.append("phone_number", data.phone || "");
+  form.append("email", data.email || "");
+  form.append("address", data.address || "");
+  form.append("file", file);
+
+  const res = await fetchJson<BackendIdValidationResult>(`${BASE_URL}/complaint/validate-id`, {
+    method: "POST",
+    body: form,
+  });
+
+  return {
+    mismatchFields: res.mismatch_fields || [],
+    proceedRecommended: !!res.proceed_recommended,
+    analysis: res.analysis || {},
   };
 }
 
@@ -261,13 +372,19 @@ export async function getAdminComplaints(): Promise<AdminComplaint[]> {
       status: item.status,
       filedDate: new Date(item.created_at).toLocaleDateString(),
       language: item.language,
+      amountLost: item.amount_lost,
+      transactionId: item.transaction_id,
+      platform: item.platform,
+      suspectDetails: item.suspect_details,
+      dateTime: item.date_time,
       suspectVpa: item.suspect_vpa,
       suspectPhone: item.suspect_phone,
       suspectBankAccount: item.suspect_bank_account,
       evidenceFiles: (item.evidence_files || []).map((f) => ({
         filePath: f.file_path,
-        fileUrl: `${BASE_URL}${f.file_url}`,
+        fileUrl: f.file_url.startsWith("http") ? f.file_url : `${BASE_URL}${f.file_url.startsWith("/") ? "" : "/"}${f.file_url}`,
         extractedText: f.extracted_text,
+        extractedTextOriginal: f.extracted_text_original,
       })),
       evidenceText: (item.evidence_files || []).map((f) => f.extracted_text).filter(Boolean).join("\n\n"),
     }));
@@ -305,9 +422,9 @@ export async function sendChatMessage(
 ): Promise<{ response: string; collected_fields?: Record<string, string> }> {
   const lastMsg = messages[messages.length - 1]?.content || "";
 
-  // Use a 3-minute timeout so slow local LLM (Ollama) has time to respond
+  // Keep timeout short for responsive voice UX.
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 180_000);
+  const timeoutId = setTimeout(() => controller.abort(), 35_000);
 
   try {
     const response = await fetchJson<{ response: string; collected_fields: Record<string, string> }>(`${BASE_URL}/chat`, {
@@ -324,12 +441,9 @@ export async function sendChatMessage(
   } catch (err: any) {
     clearTimeout(timeoutId);
     if (err?.name === "AbortError") {
-      return { response: "The AI is taking longer than usual. Please try again in a moment." };
+      return { response: "" };
     }
-    if (messages.length <= 1) {
-      return { response: "I can help you file a complaint. Please tell me what happened." };
-    }
-    return { response: "I'm having trouble connecting to the AI. Please try again." };
+    return { response: "" };
   }
 }
 

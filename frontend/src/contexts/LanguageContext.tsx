@@ -53,12 +53,18 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLang] = useState<Language>(LANGUAGES.find((lang) => lang.code === "en") || LANGUAGES[0]);
-  const [isLanguageSelected, setIsLanguageSelected] = useState(true);
+  const [language, setLang] = useState<Language>(() => {
+    const savedCode = localStorage.getItem("cyberguard_lang_code");
+    return LANGUAGES.find((lang) => lang.code === savedCode) || LANGUAGES.find((lang) => lang.code === "en") || LANGUAGES[0];
+  });
+  const [isLanguageSelected, setIsLanguageSelected] = useState(() => {
+    return Boolean(localStorage.getItem("cyberguard_lang_code"));
+  });
 
   const setLanguage = useCallback((lang: Language) => {
     setLang(lang);
     setIsLanguageSelected(true);
+    localStorage.setItem("cyberguard_lang_code", lang.code);
   }, []);
 
   const t = useCallback((key: string) => getTranslation(language.code, key), [language.code]);

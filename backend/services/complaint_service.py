@@ -7,12 +7,27 @@ from utils.ticket_service import generate_ticket_id
 
 
 class ComplaintService:
+    def _normalize_optional(self, value: str | None, default: str = "N/A") -> str:
+        text = (value or "").strip()
+        if not text or text.lower() in {"n/a", "na", "none", "skip"}:
+            return default
+        return text
+
+    def _build_fallback_email(self, payload: ComplaintCreateRequest) -> str:
+        phone_digits = "".join(ch for ch in (payload.phone_number or "") if ch.isdigit())
+        suffix = phone_digits[-10:] if phone_digits else "unknown"
+        return f"noemail_{suffix}@cyberguard.local"
+
     def upsert_user(self, db: Session, payload: ComplaintCreateRequest) -> User:
-        user = db.query(User).filter(User.email == payload.email).first()
+        normalized_email = self._normalize_optional(payload.email, "")
+        normalized_address = self._normalize_optional(payload.address)
+        target_email = normalized_email or self._build_fallback_email(payload)
+
+        user = db.query(User).filter(User.email == target_email).first()
         if user:
             user.name = payload.full_name
             user.phone = payload.phone_number
-            user.address = payload.address
+            user.address = normalized_address
             db.add(user)
             db.commit()
             db.refresh(user)
@@ -20,9 +35,9 @@ class ComplaintService:
 
         user = User(
             name=payload.full_name,
-            email=payload.email,
+            email=target_email,
             phone=payload.phone_number,
-            address=payload.address,
+            address=normalized_address,
         )
         db.add(user)
         db.commit()
@@ -37,7 +52,7 @@ class ComplaintService:
             description=payload.description,
             status="pending",
             language=payload.language,
-            date_time=payload.date_time,
+            date_time=self._normalize_optional(payload.date_time),
             amount_lost=payload.amount_lost,
             transaction_id=payload.transaction_id,
             platform=payload.platform,
@@ -64,10 +79,10 @@ class ComplaintService:
             f"Ticket ID: {ticket_id}\n"
             f"Name: {payload.full_name}\n"
             f"Phone: {payload.phone_number}\n"
-            f"Email: {payload.email}\n"
-            f"Address: {payload.address}\n"
+            f"Email: {self._normalize_optional(payload.email)}\n"
+            f"Address: {self._normalize_optional(payload.address)}\n"
             f"Type: {payload.complaint_type}\n"
-            f"Date and Time: {payload.date_time}\n"
+            f"Date and Time: {self._normalize_optional(payload.date_time)}\n"
             f"Description: {payload.description}\n"
             f"Amount Lost: {payload.amount_lost or 'N/A'}\n"
             f"Transaction ID/UTR: {payload.transaction_id or 'N/A'}\n"

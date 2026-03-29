@@ -4,6 +4,7 @@ Uses a local Ollama instance (llama2) as a drop-in alternative to Gemini.
 """
 
 import json
+import re
 import requests
 
 from utils.constants import COMPLAINT_TYPES, REQUIRED_COMPLAINT_FIELDS, SUPPORTED_LANGUAGES
@@ -11,7 +12,7 @@ from utils.constants import COMPLAINT_TYPES, REQUIRED_COMPLAINT_FIELDS, SUPPORTE
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 # Prefer smaller/faster models first; fall back to larger ones
-OLLAMA_MODEL_PREFERENCE = ["phi3:mini", "phi3", "phi", "mistral", "llama2", "codellama"]
+OLLAMA_MODEL_PREFERENCE = ["phi3:mini", "phi3", "phi", "mistral", "llama3", "llama2", "codellama"]
 
 
 class OllamaService:
@@ -21,10 +22,11 @@ class OllamaService:
 
     def _pick_model(self) -> str:
         """Return the fastest available model from the preference list."""
+        available: list[str] = []
         try:
             resp = requests.get(f"{self.base_url}/api/tags", timeout=3)
             resp.raise_for_status()
-            available = [m["name"] for m in resp.json().get("models", [])]
+            available = [m.get("name", "") for m in resp.json().get("models", []) if m.get("name")]
             print(f"[ollama] Available models: {available}")
             for preferred in OLLAMA_MODEL_PREFERENCE:
                 for avail in available:
@@ -35,19 +37,50 @@ class OllamaService:
         except Exception:
             return "llama2"
 
-    def _generate(self, prompt: str, retries: int = 2) -> str:
+    def _list_models(self) -> list[str]:
+        try:
+            resp = requests.get(f"{self.base_url}/api/tags", timeout=3)
+            resp.raise_for_status()
+            return [m.get("name", "") for m in resp.json().get("models", []) if m.get("name")]
+        except Exception:
+            return []
+
+    def _refresh_model_if_needed(self) -> None:
+        available = self._list_models()
+        if not available:
+            return
+
+        if any(self.model == model for model in available):
+            return
+
+        for preferred in OLLAMA_MODEL_PREFERENCE:
+            for avail in available:
+                if preferred in avail:
+                    self.model = avail
+                    print(f"[ollama] Refreshed model to: {self.model}")
+                    return
+
+        self.model = available[0]
+        print(f"[ollama] Refreshed model to first available: {self.model}")
+
+    def _generate(self, prompt: str, retries: int = 1) -> str:
         import time
         for i in range(retries):
             try:
+                self._refresh_model_if_needed()
                 resp = requests.post(
                     f"{self.base_url}/api/generate",
                     json={"model": self.model, "prompt": prompt, "stream": False},
-                    timeout=180,  # 3 minutes — CPU inference can be slow
+                    timeout=8,  # keep local voice UX responsive
                 )
                 resp.raise_for_status()
                 return resp.json().get("response", "")
             except Exception as e:
                 err_str = str(e).lower()
+                if "not found" in err_str and i < retries - 1:
+                    self._refresh_model_if_needed()
+                    time.sleep(0.5)
+                    continue
                 if i < retries - 1 and "timeout" not in err_str:
                     time.sleep(1)
                     continue
@@ -72,10 +105,15 @@ class OllamaService:
     def is_available(self) -> bool:
         """Check if Ollama is running and the model is available."""
         try:
-            resp = requests.get(f"{self.base_url}/api/tags", timeout=3)
-            resp.raise_for_status()
-            models = [m["name"] for m in resp.json().get("models", [])]
-            return any(self.model in m for m in models)
+            models = self._list_models()
+            if not models:
+                return False
+
+            # Keep model valid even if local model list changes over time.
+            if not any(self.model == m for m in models):
+                self._refresh_model_if_needed()
+
+            return bool(models)
         except Exception:
             return False
 
@@ -94,10 +132,38 @@ class OllamaService:
             return text
         prompt = (
             f"Translate the following text to {target_language}. "
-            "Keep meaning exact, simple, and natural.\n\n"
+            "Keep meaning exact, simple, and natural. "
+            "Return ONLY the translated text, with no explanation, no transliteration, and no quotes.\n\n"
             f"Text: {text}"
         )
-        return (self._generate(prompt) or "").strip()
+        raw = (self._generate(prompt) or "").strip()
+        return self._clean_translation_output(raw)
+
+    def _clean_translation_output(self, raw: str) -> str:
+        text = (raw or "").strip()
+        if not text:
+            return ""
+
+        lines = [line.strip(" \t\"'") for line in text.splitlines() if line.strip()]
+        if not lines:
+            return ""
+
+        meta_pattern = re.compile(
+            r"^(here('?| i)s|translation|translated|this translates|note:)",
+            flags=re.IGNORECASE,
+        )
+
+        for line in lines:
+            lowered = line.lower()
+            if meta_pattern.match(lowered):
+                continue
+            if "translates to" in lowered:
+                continue
+            if line.startswith("(") and line.endswith(")"):
+                continue
+            return line
+
+        return lines[0]
 
     def generate_complaint_chat_reply(
         self,

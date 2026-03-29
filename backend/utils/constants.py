@@ -66,19 +66,25 @@ COMPLAINT_TYPES = [
 REQUIRED_COMPLAINT_FIELDS = [
     "full_name",
     "phone_number",
-    "email",
-    "address",
     "complaint_type",
-    "date_time",
     "description",
-    "platform",
 ]
 
 UNKNOWN_INPUT_HINTS = {
-    "transaction_id": "You can find UTR in your bank SMS or transaction history.",
-    "date_time": "Check your SMS, app notifications, email timestamps, or browser history.",
-    "platform": "Mention the platform where it happened, for example UPI app, Instagram, WhatsApp, or Email.",
-    "suspect_details": "Share any known details like phone number, username, account ID, or website link.",
+    "full_name": "Please share your legal full name exactly as in Aadhaar/PAN. Example: Ravi Kumar Reddy.",
+    "phone_number": "Share your active 10-digit mobile number linked to this complaint. Example: 9876543210.",
+    "email": "Email is optional but recommended. Example: ravi123@gmail.com. If you do not have one, you can skip this field.",
+    "address": "Address is optional. City and state are enough if full address is not available. Example: Bengaluru, Karnataka.",
+    "complaint_type": "Tell the category of fraud. Example: UPI / Payment Fraud, Phishing, Social Media Hacking, Card Fraud.",
+    "transaction_id": "If transaction ID / UTR is not available, enter N/A. You can find UTR in your bank SMS or app history.",
+    "date_time": "If exact date/time is unknown, share approximate date and time. Example: 25/03/2026 around 8 PM.",
+    "description": "Explain in simple words. Template: I found a fake profile on [platform]. They did [action]. I request action.",
+    "amount_lost": "If no money was lost, enter 0. If unsure, enter an approximate amount.",
+    "suspect_vpa": "If UPI ID is not available, enter N/A. If partial, share whatever you know.",
+    "suspect_phone": "If suspect phone number is not available, enter N/A. If partial, share available digits.",
+    "suspect_bank_account": "If bank account details are unavailable, enter N/A.",
+    "platform": "If unsure, choose the closest platform. Example: Instagram, WhatsApp, Facebook, Telegram, PhonePe.",
+    "suspect_details": "Share any known scammer details: phone number, UPI ID, username, account number, website/app link.",
 }
 
 STATUS_VALUES = ["pending", "reviewing", "resolved"]

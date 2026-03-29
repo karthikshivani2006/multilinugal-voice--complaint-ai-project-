@@ -1,6 +1,6 @@
 export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
   en: {
-    language: "Language", selectLanguage: "Please select your language", greeting: "What can I help you with?",
+    language: "Language", selectLanguage: "Please select your language", languagePrompt: "Which language do you speak? For example: English, Hindi, Telugu, Tamil, Kannada, etc.", languageSelected: "selected. What can I help you with?", greeting: "What can I help you with?", thinking: "Thinking...", voiceOn: "Voice on", waitingForLanguage: "Waiting for language",
     fileComplaint: "File Complaint", trackComplaint: "Track Complaint", home: "Home", login: "Login",
     admin: "Admin", profile: "Profile", termsAndConditions: "Terms and Conditions", logout: "Logout",
     fullName: "Full Name", phone: "Phone Number", email: "Email", address: "Address",
@@ -18,7 +18,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "Failed to submit complaint. Please try again.", yourComplaintFiled: "Your complaint has been filed. Your ticket ID is "
   },
   hi: {
-    language: "भाषा", selectLanguage: "कृपया अपनी भाषा चुनें", greeting: "मैं आपकी किस तरह मदद कर सकता हूँ?",
+    language: "भाषा", selectLanguage: "कृपया अपनी भाषा चुनें", languagePrompt: "आप कौन सी भाषा बोलते हैं? उदाहरण के लिए: अंग्रेजी, हिंदी, तेलुगु, तमिल, कन्नड़, आदि", languageSelected: "चुना गया। मैं आपकी किस तरह मदद कर सकता हूँ?", greeting: "मैं आपकी किस तरह मदद कर सकता हूँ?", thinking: "सोच रहा हूँ...", voiceOn: "वॉयस चालू", waitingForLanguage: "भाषा की प्रतीक्षा में",
     fileComplaint: "शिकायत दर्ज करें", trackComplaint: "शिकायत ट्रैक करें", home: "होम", login: "लॉगिन",
     admin: "एडमिन", profile: "प्रोफाइल", termsAndConditions: "नियम और शर्तें", logout: "लॉगआउट",
     fullName: "पूरा नाम", phone: "फोन नंबर", email: "ईमेल", address: "पता",
@@ -36,7 +36,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "शिकायत दर्ज करने में विफल। कृपया पुनः प्रयास करें।", yourComplaintFiled: "आपकी शिकायत दर्ज कर ली गई है। आपकी टिकट आईडी है: "
   },
   bn: {
-    language: "ভাষা", selectLanguage: "অনুগ্রহ করে আপনার ভাষা নির্বাচন করুন", greeting: "আমি আপনাকে কীভাবে সাহায্য করতে পারি?",
+    language: "ভাষা", selectLanguage: "অনুগ্রহ করে আপনার ভাষা নির্বাচন করুন", languagePrompt: "আপনি কোন ভাষায় কথা বলেন? উদাহরণস্বরূপ: ইংরেজি, হিন্দি, তেলুগু, তামিল, কন্নড়, ইত্যাদি", languageSelected: "নির্বাচিত। আমি আপনাকে কীভাবে সাহায্য করতে পারি?", greeting: "আমি আপনাকে কীভাবে সাহায্য করতে পারি?", thinking: "চিন্তা করছি...", voiceOn: "ভয়েস অন", waitingForLanguage: "ভাষার জন্য অপেক্ষা করছি",
     fileComplaint: "অভিযোগ দায়ের করুন", trackComplaint: "অভিযোগ ট্র্যাক করুন", home: "হোম", login: "লগইন",
     admin: "অ্যাডমিন", profile: "প্রোফাইল", termsAndConditions: "শর্তাবলী", logout: "লগআউট",
     fullName: "পুরো নাম", phone: "ফোন নম্বর", email: "ইমেল", address: "ঠিকানা",
@@ -54,7 +54,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "অভিযোগ জমা দিতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।", yourComplaintFiled: "আপনার অভিযোগটি দায়ের করা হয়েছে। আপনার টিকিট আইডি হল "
   },
   ta: {
-    language: "மொழி", selectLanguage: "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்", greeting: "நான் எப்படி உதவ முடியும்?",
+    language: "மொழி", selectLanguage: "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்", languagePrompt: "நீங்கள் எந்த மொழியில் பேசுகிறீர்கள்? உதாரணமாக: ஆங்கிலம், இந்தி, తెలుగు, தமிழ், கன்னடம் போன்றவை", languageSelected: "தேர்ந்தெடுக்கப்பட்டது. நான் உங்களுக்கு எப்படி உதவ முடியும்?", greeting: "நான் எப்படி உதவ முடியும்?", thinking: "சிந்தித்துக் கொண்டிருக்கிறது...", voiceOn: "குரல் ஆன்", waitingForLanguage: "மொழிக்கு காத்திருக்கிறது",
     fileComplaint: "புகார் பதிவு", trackComplaint: "புகார் கண்காணிப்பு", home: "முகப்பு", login: "உள்நுழைவு",
     admin: "நிர்வாகி", profile: "சுயவிவரம்", termsAndConditions: "விதிமுறைகள்", logout: "வெளியேறு",
     fullName: "முழு பெயர்", phone: "தொலைபேசி எண்", email: "மின்னஞ்சல்", address: "முகவரி",
@@ -72,7 +72,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "புகாரை சமர்ப்பிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.", yourComplaintFiled: "உங்கள் புகார் பதிவு செய்யப்பட்டுள்ளது. உங்கள் டிக்கெட் ஐடி "
   },
   te: {
-    language: "భాష", selectLanguage: "దయచేసి మీ భాషను ఎంచుకోండి", greeting: "నేను మీకు ఎలా సహాయం చేయగలను?",
+    language: "భాష", selectLanguage: "దయచేసి మీ భాషను ఎంచుకోండి", languagePrompt: "మీరు ఏ భాషలో మాట్లాడతారు? ఉదాహరణకు: ఇంగ్లీష్, హిందీ, తెలుగు, తమిళ్, కన్నడ, వంటివి", languageSelected: "ఎంపిక చేయబడింది. నేను మీకు ఎలా సహాయం చేయగలను?", greeting: "నేను మీకు ఎలా సహాయం చేయగలను?", thinking: "ఆలోచిస్తోంది...", voiceOn: "వాయిస్ ఆన్", waitingForLanguage: "భాష కోసం కాస్తోంది",
     fileComplaint: "ఫిర్యాదు నమోదు", trackComplaint: "ఫిర్యాదు ట్రాక్", home: "హోమ్", login: "లాగిన్",
     admin: "అడ్మిన్", profile: "ప్రొఫైల్", termsAndConditions: "నియమాలు", logout: "లాగ్ అవుట్",
     fullName: "పూర్తి పేరు", phone: "ఫోన్ నంబర్", email: "ఇమెయిల్", address: "చిరునామా",
@@ -90,7 +90,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "ఫిర్యాదు సమర్పించబడలేదు. మళ్లీ ప్రయత్నించండి.", yourComplaintFiled: "మీ ఫిర్యాదు నమోదు చేయబడింది. మీ టికెట్ ID "
   },
   kn: {
-    language: "ಭಾಷೆ", selectLanguage: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ", greeting: "ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?",
+    language: "ಭಾಷೆ", selectLanguage: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ", languagePrompt: "ನೀವು ಯಾವ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡುತ್ತೀರಿ? ಉದಾಹರಣೆಗೆ: ಇಂಗ್ಲಿಷ್, ಹಿಂದಿ, తెలుగు, ತಮಿಳು, ಕನ್ನಡ, ಇತ್ಯಾದಿ", languageSelected: "ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ. ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?", greeting: "ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?", thinking: "ಯೋಚಿಸುತ್ತಿದೆ...", voiceOn: "ವಾಯ್ಸ್ ಆನ್", waitingForLanguage: "ಭಾಷೆಗಾಗಿ ಕಾಯುತ್ತಿದೆ",
     fileComplaint: "ದೂರು ದಾಖಲಿಸಿ", trackComplaint: "ದೂರು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ", home: "ಮುಖಪುಟ", login: "ಲಾಗಿನ್",
     admin: "ಅಡ್ಮಿನ್", profile: "ಪ್ರೊಫೈಲ್", termsAndConditions: "ನಿಯಮಗಳು", logout: "ಲಾಗ್ ಔಟ್",
     fullName: "ಪೂರ್ಣ ಹೆಸರು", phone: "ಫೋನ್ ಸಂಖ್ಯೆ", email: "ಇಮೇಲ್", address: "ವಿಳಾಸ",
@@ -108,7 +108,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "ದೂರು ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", yourComplaintFiled: "ನಿಮ್ಮ ದೂರನ್ನು ದಾಖಲಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ಟಿಕೆಟ್ ಐಡಿ "
   },
   ml: {
-    language: "ഭാഷ", selectLanguage: "ദയവായി നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക", greeting: "ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കാം?",
+    language: "ഭാഷ", selectLanguage: "ദയവായി നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക", languagePrompt: "നിങ്ങൾ ഏതു ഭാഷയിൽ സംസാരിക്കുന്നു? ഉദാഹരണത്തിന്: ഇംഗ്ലീഷ്, ഹിന്ദി, തെലുങ്ക്, തമിഴ്, കന്നട, മുതലായവ", languageSelected: "തിരഞ്ഞെടുത്തു. ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കാം?", greeting: "ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കാം?", thinking: "ചിന്തിക്കുന്നു...", voiceOn: "വോയിസ് ഓൺ", waitingForLanguage: "ഭാഷയ്ക്കായി കാത്തിരിക്കുന്നു",
     fileComplaint: "പരാതി നൽകുക", trackComplaint: "പരാതി ട്രാക്ക് ചെയ്യുക", home: "ഹോം", login: "ലോഗിൻ",
     admin: "അഡ്മിൻ", profile: "പ്രൊഫൈൽ", termsAndConditions: "നിബന്ധനകൾ", logout: "ലോഗ് ഔട്ട്",
     fullName: "പൂർണ്ണമായ പേര്", phone: "ഫോൺ നമ്പർ", email: "ഇമെയിൽ", address: "വിലാസം",
@@ -126,7 +126,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "പരാതി സമർപ്പിക്കുന്നതിൽ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക.", yourComplaintFiled: "നിങ്ങളുടെ പരാതി ഫയൽ ചെയ്തു. നിങ്ങളുടെ ടിക്കറ്റ് ഐഡി "
   },
   mr: {
-    language: "भाषा", selectLanguage: "कृपया आपली भाषा निवडा", greeting: "मी तुम्हाला कशी मदत करू शकतो?",
+    language: "भाषा", selectLanguage: "कृपया आपली भाषा निवडा", languagePrompt: "आप कोणत्या भाषेत बोलता? उदाहरणार्थ: इंग्रजी, हिंदी, तेलुगु, तमिळ, कन्नड, इत्यादी", languageSelected: "निवडण्यात आले. मी तुम्हाला कशी मदत करू शकतो?", greeting: "मी तुम्हाला कशी मदत करू शकतो?", thinking: "विचार करत आहे...", voiceOn: "व्हॉईस ऑन", waitingForLanguage: "भाषेच्या प्रतीक्षेत",
     fileComplaint: "तक्रार नोंदवा", trackComplaint: "तक्रार ट्रॅक करा", home: "मुख्यपृष्ठ", login: "लॉगिन",
     admin: "अॅडमिन", profile: "प्रोफाइल", termsAndConditions: "अटी आणि शर्ती", logout: "लॉगआउट",
     fullName: "पूर्ण नाव", phone: "फोन नंबर", email: "ईमेल", address: "पत्ता",
@@ -144,7 +144,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "तक्रार सबमिट करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.", yourComplaintFiled: "तुमची तक्रार नोंदवली गेली आहे. तुमचा तिकीट आयडी आहे "
   },
   gu: {
-    language: "ભાષા", selectLanguage: "કૃપા કરીને તમારી ભાષા પસંદ કરો", greeting: "હું તમારી કેવી રીતે મદદ કરી શકું?",
+    language: "ભાષા", selectLanguage: "કૃપા કરીને તમારી ભાષા પસંદ કરો", languagePrompt: "તમે કોની ભાષায় બોલો છો? ઉદાહરણ તરીકે: અંગ્રેજી, હિંદી, తెలుగు, તમિલ, કન્નડ, વગેરે", languageSelected: "પસંદ કરવામાં આવ્યું. હું તમારી કેવી રીતે મદદ કરી શકું?", greeting: "હું તમારી કેવી રીતે મદદ કરી શકું?", thinking: "વિચાર કરી રહ્યાં છીએ...", voiceOn: "વોઇસ ચાલુ", waitingForLanguage: "ભાષાની રાહ જોતાં છીએ",
     fileComplaint: "ફરિયાદ નોંધાવો", trackComplaint: "ફરિયાદ ટ્રેક કરો", home: "હોમ", login: "લોગિન",
     admin: "એડમિન", profile: "પ્રોફાઇલ", termsAndConditions: "નિયમો અને શરતો", logout: "લોગઆઉટ",
     fullName: "પૂરું નામ", phone: "ફોન નંબર", email: "ઇમેઇલ", address: "સરનામું",
@@ -162,7 +162,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "ફરિયાદ સબમિટ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.", yourComplaintFiled: "તમારી ફરિયાદ નોંધાઈ ગઈ છે. તમારો ટિકિટ આઈડી છે "
   },
   pa: {
-    language: "ਭਾਸ਼ਾ", selectLanguage: "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ", greeting: "ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?",
+    language: "ਭਾਸ਼ਾ", selectLanguage: "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ", languagePrompt: "ਤੁਸੀਂ ਕਿਹੜੀ ਭਾਸ਼ਾ ਵਿੱਚ ਬੋਲਦੇ ਹੋ? ਉਦਾਹਰਣ ਲਈ: ਅੰਗ੍ਰੇਜ਼ੀ, ਹਿੰਦੀ, తెలుగు, ਤਾਮਿਲ, ਕੰਨੜ, ਆਦਿ", languageSelected: "ਚੁਣਿਆ ਗਿਆ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?", greeting: "ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?", thinking: "ਸੋਚ ਰਿਹਾ ਹਾਂ...", voiceOn: "ਵਾਇਸ ਚਾਲੂ", waitingForLanguage: "ਭਾਸ਼ਾ ਦੀ ਉਡੀਕ",
     fileComplaint: "ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ", trackComplaint: "ਸ਼ਿਕਾਇਤ ਟਰੈਕ ਕਰੋ", home: "ਘਰ", login: "ਲਾਗਇਨ",
     admin: "ਐਡਮਿਨ", profile: "ਪ੍ਰੋਫਾਈਲ", termsAndConditions: "ਨਿਯਮ ਅਤੇ ਸ਼ਰਤਾਂ", logout: "ਲਾਗ ਆਊਟ",
     fullName: "ਪੂਰਾ ਨਾਮ", phone: "ਫੋਨ ਨੰਬਰ", email: "ਈਮੇਲ", address: "ਪਤਾ",
@@ -180,7 +180,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨ ਵਿੱਚ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।", yourComplaintFiled: "ਤੁਹਾਡੀ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰ ਲਈ ਗਈ ਹੈ। ਤੁਹਾਡਾ ਟਿਕਟ ਆਈਡੀ ਹੈ "
   },
   ur: {
-    language: "زبان", selectLanguage: "براہ کرم اپنی زبان منتخب کریں", greeting: "میں آپ کی کس طرح مدد کر سکتا ہوں؟",
+    language: "زبان", selectLanguage: "براہ کرم اپنی زبان منتخب کریں", languagePrompt: "آپ کون سی زبان بولتے ہیں؟ مثال کے طور پر: انگریزی، ہندی، تیلگو، تمل، کنڑ، وغیرہ", languageSelected: "منتخب۔ میں آپ کی کس طرح مدد کر سکتا ہوں؟", greeting: "میں آپ کی کس طرح مدد کر سکتا ہوں؟", thinking: "سوچ رہا ہوں...", voiceOn: "آواز آن", waitingForLanguage: "زبان کا انتظار",
     fileComplaint: "شکایت درج کریں", trackComplaint: "شکایت ٹریک کریں", home: "ہوم", login: "لاگ ان",
     admin: "ایڈمن", profile: "پروفائل", termsAndConditions: "شرائط و ضوابط", logout: "لاگ آؤٹ",
     fullName: "پورا نام", phone: "فون نمبر", email: "ای میل", address: "پتہ",
@@ -198,7 +198,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "شکایت جمع کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔", yourComplaintFiled: "آپ کی شکایت درج کر لی گئی ہے۔ آپ کا ٹکٹ آئی ڈی ہے: "
   },
   or: {
-    language: "ଭାଷା", selectLanguage: "ଦୟାକରି ଆପଣଙ୍କ ଭାଷା ଚୟନ କରନ୍ତୁ", greeting: "ମୁଁ ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?",
+    language: "ଭାଷା", selectLanguage: "ଦୟାକରି ଆପଣଙ୍କ ଭାଷା ଚୟନ କରନ୍ତୁ", languagePrompt: "ଆପଣ କେଉଁ ଭାଷାରେ କଥା ହୁଅନ୍ତି? ଉଦାହରଣସ୍ୱରୂପ: ଇଂରାଜୀ, ହିନ୍ଦୀ, తెలుగు, ତାମିଲ, କନ୍ନଡ, ଇତ୍ୟାଦି", languageSelected: "ନିର୍ବାଚିତ। ମୁଁ ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?", greeting: "ମୁଁ ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?", thinking: "ଚିନ୍ତାକରୁଛି...", voiceOn: "ଭଏସ ଅନ", waitingForLanguage: "ଭାଷାର ଅପେକ୍ଷା",
     fileComplaint: "ଅଭିଯୋଗ ଦାଖଲ କରନ୍ତୁ", trackComplaint: "ଅଭିଯୋଗ ଟ୍ରାକ୍ କରନ୍ତୁ", home: "ହୋମ୍", login: "ଲଗଇନ୍",
     admin: "ଆଡମିନ୍", profile: "ପ୍ରୋଫାଇଲ୍", termsAndConditions: "ସର୍ତ୍ତାବଳୀ", logout: "ଲଗଆଉଟ୍",
     fullName: "ପୂରା ନାମ", phone: "ଫୋନ୍ ନମ୍ବର", email: "ଇମେଲ୍", address: "ଠିକଣା",
@@ -216,7 +216,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "ଅଭିଯୋଗ ଦାଖଲ କରିବାରେ ବିଫଳ ହେଲା। ଦୟାକରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ।", yourComplaintFiled: "ଆପଣଙ୍କ ଅଭିଯୋଗ ଦାଖଲ ହୋଇଛି। ଆପଣଙ୍କର ଟିକେଟ୍ ଆଇଡି ହେଉଛି "
   },
   as: {
-    language: "ভাষা", selectLanguage: "অনুগ্ৰহ কৰি আপোনাৰ ভাষা বাছনি কৰক", greeting: "মই আপোনাক কেনেকৈ সহায় কৰিব পাৰো?",
+    language: "ভাষা", selectLanguage: "অনুগ্ৰহ কৰি আপোনাৰ ভাষা বাছনি কৰক", languagePrompt: "আপুনি কেনে ভাষাত কথা কয়? উদাহৰণস্বৰূপ: ইংৰাজী, হিন্দী, తెలుగు, তামিল, কন্নড়, ইত্যাদি", languageSelected: "নির্বাচিত। মই আপোনাক কেনেকৈ সহায় কৰিব পাৰো?", greeting: "মই আপোনাক কেনেকৈ সহায় কৰিব পাৰো?", thinking: "চিন্তা কৰুছো...", voiceOn: "ভয়েস অন", waitingForLanguage: "ভাষাৰ বাবে অপেক্ষা কৰিছো",
     fileComplaint: "অভিযোগ দাখিল কৰক", trackComplaint: "অভিযোগ অনুসৰণ কৰক", home: "হোম", login: "লগইন",
     admin: "এডমিন", profile: "প্ৰফাইল", termsAndConditions: "চৰ্তাৱলী", logout: "লগআউট",
     fullName: "সম্পূৰ্ণ নাম", phone: "ফোন নম্বৰ", email: "ইমেইল", address: "ঠিকনা",
@@ -234,7 +234,7 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     failedSubmit: "অভিযোগ দাখিল কৰিবলৈ ব্যৰ্থ হৈছে। অনুগ্ৰহ কৰি আকৌ চেষ্টা কৰক।", yourComplaintFiled: "আপোনাৰ অভিযোগ দাখিল কৰা হৈছে। আপোনাৰ টিকট আইডি হৈছে "
   },
   ne: {
-    language: "भाषा", selectLanguage: "कृपया आफ्नो भाषा चयन गर्नुहोस्", greeting: "म तपाइँलाई कसरी मद्दत गर्न सक्छु?",
+    language: "भाषा", selectLanguage: "कृपया आफ्नो भाषा चयन गर्नुहोस्", languagePrompt: "तपाइँ कुन भाषामा कुरा गर्नुहुन्छ? उदाहरणको लागि: अंग्रेजी, हिन्दी, తెలుగు, तामिल, कन्नड, आदि", languageSelected: "चयन गरिएको। म तपाइँलाई कसरी मद्दत गर्न सक्छु?", greeting: "म तपाइँलाई कसरी मद्दत गर्न सक्छु?", thinking: "सोच्दैछु...", voiceOn: "भ्वाइस अन", waitingForLanguage: "भाषाको प्रतीक्षामा",
     fileComplaint: "उजुरी दर्ता गर्नुहोस्", trackComplaint: "उजुरी ट्र्याक गर्नुहोस्", home: "गृहपृष्ठ", login: "लगइन",
     admin: "एडमिन", profile: "प्रोफाइल", termsAndConditions: "नियम र सर्तहरू", logout: "लगआउट",
     fullName: "पूरा नाम", phone: "फोन नम्बर", email: "इमेल", address: "ठेगाना",
@@ -251,14 +251,167 @@ export const FULL_TRANSLATIONS: Record<string, Record<string, string>> = {
     idHint: "आधार / प्यान", conversationIn: "कुराकानीको भाषा", sorryError: "माफ गर्नुहोस्, केही गलत भयो। कृपया फेरि प्रयास गर्नुहोस्।",
     failedSubmit: "उजुरी बुझाउन असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।", yourComplaintFiled: "तपाईंको उजुरी दर्ता भएको छ। तपाईंको टिकट आईडी हो: "
   },
-  // The remaining languages use fallback to English or partial translations to save space, but UI logic will use English automatically if keys are missing.
-  kok: { language: "भास", selectLanguage: "आपली भास वेंचात", home: "घर", fileComplaint: "तक्रार नोंद करात", trackComplaint: "तक्रार मागोवा", profile: "प्रोफाइल", logout: "बायर पडात" },
-  doi: { language: "भाषा", selectLanguage: "कृपया अपनी भाषा चुनो", home: "घर", fileComplaint: "शिकायत दर्ज करो", trackComplaint: "शिकायत ट्रैक करो", profile: "प्रोफाइल", logout: "लॉग आउट" },
-  brx: { language: "राव", selectLanguage: "जोंहार, राव सालायो", home: "हामथाय", fileComplaint: "गोजोन थाबा", trackComplaint: "गोजोन ट्रेक", profile: "प्रोफाइल", logout: "लॉग आउट" },
-  ks: { language: "زٕبان", selectLanguage: "مہربٲنی کرتھ زبان ژٕریو", home: "گھر", fileComplaint: "شکایت درج کریں", trackComplaint: "شکایت ٹریک کریں", profile: "پروفائل", logout: "لاگ آؤٹ" },
-  sd: { language: "ٻولي", selectLanguage: "مهرباني ڪري پنهنجي ٻولي چونڊيو", home: "گهر", fileComplaint: "شڪايت داخل ڪريو", trackComplaint: "شڪايت ٽريڪ ڪريو", profile: "پروفائل", logout: "لاگ آئوٽ" },
-  mai: { language: "भाषा", selectLanguage: "कृपया अपन भाषा चुनू", home: "घर", fileComplaint: "शिकायत दर्ज करू", trackComplaint: "शिकायत ट्रैक करू", profile: "प्रोफाइल", logout: "लॉगआउट" },
-  mni: { language: "ꯂꯣꯟ", selectLanguage: "ꯅꯍꯥꯛꯀꯤ ꯂꯣꯟ ꯈꯜꯂꯨ", home: "ꯌꯨꯝ", fileComplaint: "ꯀꯨꯝꯄꯂꯩꯟ ꯊꯧꯔꯛꯎ", trackComplaint: "ꯀꯨꯝꯄꯂꯩꯟ ꯇ꯭ꯔꯦꯛ", profile: "ꯄ꯭ꯔꯣꯐꯥꯏꯜ", logout: "ꯂꯣꯒ ꯑꯥꯎꯠ" },
-  sa: { language: "भाषा", selectLanguage: "कृपया स्वभाषां वृणुत", home: "गृहम्", fileComplaint: "अभियोगं निबध्नुत", trackComplaint: "अभियोगं अनुगच्छत", profile: "प्रोफाइल", logout: "निर्गच्छ" },
-  sat: { language: "ᱯᱟᱹᱨᱥᱤ", selectLanguage: "ᱟᱢ ᱯᱟᱹᱨᱥᱤ ᱵᱟᱪᱷᱟᱣ ᱢᱮ", home: "ᱚᱲᱟᱜ", fileComplaint: "ᱟᱹᱯᱤᱞ ᱫᱟᱭᱮᱨ", trackComplaint: "ᱟᱹᱯᱤᱞ ᱴᱨᱮᱠ", profile: "ᱯᱨᱚᱯᱷᱟᱭᱤᱞ", logout: "ᱞᱚᱜ ᱟᱣᱩᱴ" }
+  // Complete translations for all remaining languages
+  kok: {
+    language: "भास", selectLanguage: "आपली भास वेंचात", languagePrompt: "तुमीक कळे भास उलयताय? उदाहरणां: अंग्रेज, हिंदी, తెలుగు, तमिळ, कन्नड, आदी", languageSelected: "वेंचाल. तुमां काय मदत करू शकलो?", greeting: "तुमां काय मदत करू शकलो?", thinking: "विचारलो आसा...", voiceOn: "व्हॉयस चणि", waitingForLanguage: "भास राणांत आसा",
+    fileComplaint: "तक्रार नोंद करात", trackComplaint: "तक्रार मागोवा", home: "घर", login: "प्रवेश करात",
+    admin: "प्रशासक", profile: "प्रोफाइल", termsAndConditions: "नियम आनी शर्ती", logout: "बायर पडात",
+    fullName: "पूर्ण नांव", phone: "फोन क्रमांक", email: "इमेल", address: "पत्ता",
+    incidentType: "घटनेचो प्रकार", dateTime: "घटनेचो दिनांक आनी वेळ", description: "वर्णन",
+    amountLost: "गमावललो रक्कम", transactionId: "व्यवहार आयडी / UTR", suspectDetails: "संशयिताचे तपशील",
+    platform: "प्लॅटफॉर्म", uploadEvidence: "पुरावा अपलोड करात", uploadId: "ओळखपत्र अपलोड करात",
+    submit: "तक्रार सबमित करात", ticketId: "तिकीट आयडी", trackStatus: "स्थिती मागोवा करात", pending: "प्रलंबित",
+    reviewing: "पुनरावलोकन करतलो", resolved: "निराकरण जाले", speakNow: "आता बोलात...", listening: "ऐकतलो...",
+    cyberGuard: "सायबरगार्ड एआय", tagline: "राष्ट्रीय सायबर गुन्हे तक्रार प्रणाली", helpline: "सहाय्य दूरध्वनी: 1930",
+    govIndia: "भारत सरकार", ministry: "अंतर्गत मंत्रालय", complaintForm: "तक्रार फॉर्म",
+    autoFilled: "एआय संभाषणान् वरवीं ऑटो-भरलो", aiAssistant: "एआय सहाय्यक", selectItem: "वेंचात...",
+    submitting: "सबमित करतलो...", complaintSuccess: "तक्रार यशस्वीपणान् नोंदवली", complaintRegistered: "तुमाची तक्रार नोंदवली गेली आहे।",
+    saveTicketId: "तक्रारीची स्थिती मागोवा करपा खातीर हो तिकीट आयडी साचून दवरात।", evidenceHint: "ऑडिओ, व्हिडिओ, पीडीएफ, चित्रां",
+    idHint: "आधार / पॅन", conversationIn: "संभाषणाची भास", sorryError: "माफ करात, काय एक चूक जाली। कृपा पुन्हां प्रयत्न करात।",
+    failedSubmit: "तक्रार सबमित करपांत अयशस्वी। कृपा पुन्हां प्रयत्न करात।", yourComplaintFiled: "तुमाची तक्रार नोंदवली गेली आहे। तुमाचो तिकीट आयडी आसा: "
+  },
+  doi: {
+    language: "भाषा", selectLanguage: "कृपया अपनी भाषा चुनो", languagePrompt: "तुई किस भाषा बोलद? मसाल: अंग्रेजी, हिंदी, తెలుగు, तमिल, कन्नड़, वग़ैरह", languageSelected: "चुन लिया. मैं आपकी कैस तरह मदद कर सकतो?", greeting: "मैं आपकी कैस तरह मदद कर सकतो?", thinking: "सोच रहा हूँ...", voiceOn: "आवाज चालू", waitingForLanguage: "भाषा की प्रतीक्षा",
+    fileComplaint: "शिकायत दर्ज करो", trackComplaint: "शिकायत ट्रैक करो", home: "घर", login: "लॉगिन",
+    admin: "प्रशासक", profile: "प्रोफाइल", termsAndConditions: "नियम और शर्तें", logout: "लॉग आउट",
+    fullName: "पूरा नाम", phone: "फोन नंबर", email: "ईमेल", address: "पता",
+    incidentType: "घटना का प्रकार", dateTime: "घटना की तारीख और समय", description: "विवरण",
+    amountLost: "खोई गई राशि", transactionId: "ट्रांजेक्शन आईडी / UTR", suspectDetails: "संदिग्ध का विवरण",
+    platform: "प्लेटफॉर्म", uploadEvidence: "सबूत अपलोड करो", uploadId: "पहचान पत्र अपलोड करो",
+    submit: "शिकायत दर्ज करो", ticketId: "टिकट आईडी", trackStatus: "स्थिति ट्रैक करो", pending: "लंबित",
+    reviewing: "समीक्षा में", resolved: "हल किया गया", speakNow: "अब बोलो...", listening: "सुन रहा हूँ...",
+    cyberGuard: "साइबरगार्ड AI", tagline: "राष्ट्रीय साइबर अपराध शिकायत प्रणाली", helpline: "हेल्पलाइन: 1930",
+    govIndia: "भारत सरकार", ministry: "गृह मंत्रालय", complaintForm: "शिकायत फॉर्म",
+    autoFilled: "AI बातचीत द्वारा ऑटो-फिल", aiAssistant: "AI सहायक", selectItem: "चुनो...",
+    submitting: "सबमिट किया जा रहा है...", complaintSuccess: "शिकायत सफलतापूर्वक दर्ज की गई", complaintRegistered: "आपकी शिकायत पंजीकृत कर ली गई है।",
+    saveTicketId: "अपनी शिकायत की स्थिति ट्रैक करने के लिए इस टिकट आईडी को सहेजो।", evidenceHint: "ऑडियो, वीडिओ, पीडीएफ, छवियां",
+    idHint: "आधार / पैन", conversationIn: "बातचीत की भाषा", sorryError: "क्षमा करो, कुछ गलत हो गया। कृपया पुनः प्रयास करो।",
+    failedSubmit: "शिकायत दर्ज करने में विफल। कृपया पुनः प्रयास करो।", yourComplaintFiled: "आपकी शिकायत दर्ज कर ली गई है। आपकी टिकट आईडी है: "
+  },
+  brx: {
+    language: "राव", selectLanguage: "जोंहार, राव सालायो", languagePrompt: "तुमी किन राव बोलैद? मुरां अखु: इंग्रिजी, हिन्दी, తెలుగు, तमिल, कन्नड, आओ सुबै", languageSelected: "सालायो जोमथे. जो तुमां काय लागै मैदो कर सकै?", greeting: "जो तुमां काय लागै मैदो कर सकै?", thinking: "सोबो आसा...", voiceOn: "सोर चणि", waitingForLanguage: "राव राणांत",
+    fileComplaint: "गोजोन थाबा", trackComplaint: "गोजोन ट्रेक", home: "हामथाय", login: "लागइन",
+    admin: "एडमिन", profile: "प्रोफाइल", termsAndConditions: "नियम आरु शर्त", logout: "लॉग आउट",
+    fullName: "पूरा नाम", phone: "फोन नंबर", email: "ईमेल", address: "पता",
+    incidentType: "ऐताय तोखर", dateTime: "ऐताय दिनांक आरु समय", description: "विवरण",
+    amountLost: "हारावो पैसा", transactionId: "ट्रांजेक्शन आईडी / UTR", suspectDetails: "संदिग्ध विवरण",
+    platform: "प्लेटफॉर्म", uploadEvidence: "प्रमाण अपलोड करा", uploadId: "परिचय पत्र अपलोड करा",
+    submit: "गोजोन थाबा", ticketId: "टिकट आईडी", trackStatus: "स्थिति ट्रेक करा", pending: "रुवार",
+    reviewing: "समीक्षा खंयो", resolved: "समाधान जोमथे", speakNow: "आहिन बोला...", listening: "सुनै...",
+    cyberGuard: "साइबरगार्ड एआई", tagline: "राष्ट्रीय साइबर अपराध गोजोन प्रणाली", helpline: "सहाय्य दूरभाष: 1930",
+    govIndia: "भारत सरकार", ministry: "गृह मंत्रालय", complaintForm: "गोजोन फॉर्म",
+    autoFilled: "AI गथेन साहोनग् ऑटो-भरमथे", aiAssistant: "AI सहिदो", selectItem: "सालायो...",
+    submitting: "जमा खंयो...", complaintSuccess: "गोजोन सफलतान् जमा जोमथे", complaintRegistered: "तुमार गोजोन दर्ज जोमाय।",
+    saveTicketId: "तुमार गोजोन स्थिति ट्रेक करपो खातीर ई टिकट आईडी सुरक्षित करा।", evidenceHint: "ऑडियो, वीडियो, पीडीएफ, तस्वीर",
+    idHint: "आधार / पैन", conversationIn: "गथार राव", sorryError: "क्षमा करा, काय गलत जोमथे। कृपा फाबै प्रयास करा।",
+    failedSubmit: "गोजोन जमा करपोन विफल। कृपा फाबै प्रयास करा।", yourComplaintFiled: "तुमार गोजोन दर्ज जोमाय। तुमार टिकट आईडी: "
+  },
+  ks: {
+    language: "کٕشُر", selectLanguage: "مہربٲنی کرتھ زبان جٍنُو", languagePrompt: "توہ کۆن زبان ۊنُو ہٕ؟ مثال: انگریز، ہندی، తెలుగు، تمل، کنڑ، ۋۊغیرہ", languageSelected: "جٍنُو۔ مے تمہیں کیہ مدد کر سکوں؟", greeting: "مے تمہیں کیہ مدد کر سکوں؟", thinking: "سوچنہ...", voiceOn: "آوازہ چھی", waitingForLanguage: "زبانہ کہ انتظار",
+    fileComplaint: "شکایت درج کریں", trackComplaint: "شکایت ٹریک کریں", home: "گھر", login: "داخل ہون",
+    admin: "منتظم", profile: "پروفائل", termsAndConditions: "شرائط و ضوابط", logout: "لاگ آؤٹ",
+    fullName: "مکمل نام", phone: "فون نمبر", email: "ای میل", address: "پتہ",
+    incidentType: "واقعہ کی قسم", dateTime: "واقعہ کی تاریخ و وقت", description: "تفصیل",
+    amountLost: "کھوئی ہوئی رقم", transactionId: "ٹرانزیکشن کوڈ / UTR", suspectDetails: "مشکوک کی تفصیلات",
+    platform: "پلیٹ فارم", uploadEvidence: "ثبوت اپ لوڈ کریں", uploadId: "شناخت کارڈ اپ لوڈ کریں",
+    submit: "شکایت جمع کریں", ticketId: "ٹکٹ کوڈ", trackStatus: "حالت دیکھیں", pending: "زیر التوا",
+    reviewing: "جائزہ لیا جا رہا", resolved: "حل ہو گیا", speakNow: "اب بولیں...", listening: "سن رہا ہے...",
+    cyberGuard: "سائبر گارڈ اے آئی", tagline: "ملی سائبر جرم شکایت نظام", helpline: "ہیلپ لائن: 1930",
+    govIndia: "ہند حکومت", ministry: "داخلہ وزارت", complaintForm: "شکایت فارم",
+    autoFilled: "اے آئی گفتگو سے خودکار بھرا", aiAssistant: "اے آئی معاون", selectItem: "منتخب کریں...",
+    submitting: "جمع کیا جا رہا ہے...", complaintSuccess: "شکایت کامیاب درج ہوئی", complaintRegistered: "آپ کی شکایت درج ہو گئی۔",
+    saveTicketId: "اپنی شکایت کی صورتحال دیکھنے کے لیے یہ ٹکٹ کوڈ محفوظ کریں۔", evidenceHint: "آڈیو، ویڈیو، پیڈی ایف، تصاویر",
+    idHint: "آدھار / پین", conversationIn: "گفتگو کی زبان", sorryError: "افسوس، کچھ غلط ہوا۔ براہ مہربانی دوبارہ کوشش کریں۔",
+    failedSubmit: "شکایت جمع کرنے میں ناکام۔ براہ مہربانی دوبارہ کوشش کریں۔", yourComplaintFiled: "آپ کی شکایت درج ہو گئی۔ آپ کا ٹکٹ کوڈ ہے: "
+  },
+  sd: {
+    language: "سندھی", selectLanguage: "مہربٱنی ڪري پنهنجي ٻولي چونڙيو", languagePrompt: "توھان ڪوئن ٻولي ۾ بولندا؟ مثال: انگريزي، ھندي، తెలుగు، تامل، ڪنڌ، وغيره", languageSelected: "چونڙيو ويو. مان توهان کي ڪسيء مدد ڪر سگهان ٿو؟", greeting: "مان توهان کي ڪسيء مدد ڪر سگهان ٿو؟", thinking: "سوچويندو آهيان...", voiceOn: "آواز آن", waitingForLanguage: "ٻولي جي انتظار",
+    fileComplaint: "شڪايت درج ڪريو", trackComplaint: "شڪايت ٽريڪ ڪريو", home: "گهر", login: "لاگ اِن",
+    admin: "ايڊمن", profile: "پروفائيل", termsAndConditions: "شرطون ۽ حالتون", logout: "لاگ آئوٽ",
+    fullName: "پورو نالو", phone: "فون نمبر", email: "اي ميل", address: "پتو",
+    incidentType: "واقعي جو قسم", dateTime: "واقعي جو تاريخ ۽ وقت", description: "تفصيل",
+    amountLost: "گم ٿيل رقم", transactionId: "ٽرانزيڪشن ID / UTR", suspectDetails: "مشڪوڪ جي تفصيلات",
+    platform: "پليٽ فارم", uploadEvidence: "ثبوت اپ لوڊ ڪريو", uploadId: "سڃاند پڙ اپ لوڊ ڪريو",
+    submit: "شڪايت جمع ڪريو", ticketId: "ٽڪٽ ID", trackStatus: "حالت ٽريڪ ڪريو", pending: "زير التوا",
+    reviewing: "جائزو لي رهيو", resolved: "حل ٿي ويو", speakNow: "هاڻي ڳالهايو...", listening: "ٻڪڻو...",
+    cyberGuard: "سائبر گارڊ AI", tagline: "ملي سائبر جرم شڪايت سسٽم", helpline: "مدد فون: 1930",
+    govIndia: "هند حڪومت", ministry: "اندروني وزارت", complaintForm: "شڪايت فارم",
+    autoFilled: "AI ڪنهن توڙي خودڪار ڀرجي", aiAssistant: "AI مددگار", selectItem: "چونڊيو...",
+    submitting: "جمع ٿي رهيو آهي...", complaintSuccess: "شڪايت ڪامياب طريقي سان درج ٿي", complaintRegistered: "توهان جي شڪايت درج ٿي چڪي آهي۔",
+    saveTicketId: "توهان جي شڪايت جي حالت ٽريڪ ڪرڻ لاء هي ٽڪٹ ID محفوظ ڪريو۔", evidenceHint: "آڊيو، ويڊيو، PDF، تصويرون",
+    idHint: "آدھار / پين", conversationIn: "ڪنهن جي ٻولي", sorryError: "معافڪري، ڪجھ غلط ٿي ويو۔ براهه ڪري ٻيهر ڪوشش ڪريو۔",
+    failedSubmit: "شڪايت جمع ڪرڻ ۾ ناڪام۔ براهه ڪري ٻيهر ڪوشش ڪريو۔", yourComplaintFiled: "توهان جي شڪايت درج ٿي چڪي آهي۔ توهان جو ٽڪٹ ID ھے: "
+  },
+  mai: {
+    language: "मैथिली", selectLanguage: "कृपया अपन भाषा चुनू", languagePrompt: "अहॉं किन भाषे बजैत छी? जेना: अंग्रेजी, हिंदी, తెలుగు, तमिल, कन्नड, आदि", languageSelected: "चुनल गेल अछि. हम अहां केँ कोना मदद कऽ सकै छी?", greeting: "हम अहां केँ कोना मदद कऽ सकै छी?", thinking: "सोचि रहल छी...", voiceOn: "आवाज अन", waitingForLanguage: "भाषेक राह",
+    fileComplaint: "शिकायत दर्ज करू", trackComplaint: "शिकायत ट्रैक करू", home: "घर", login: "लॉगिन",
+    admin: "प्रशासक", profile: "प्रोफाइल", termsAndConditions: "नियम और शर्तें", logout: "लॉगआउट",
+    fullName: "पूरा नाम", phone: "फोन नंबर", email: "ई-मेल", address: "पता",
+    incidentType: "घटना का प्रकार", dateTime: "घटना की तारीख और समय", description: "विवरण",
+    amountLost: "खोई गई राशि", transactionId: "लेनदेन आईडी / UTR", suspectDetails: "संदिग्ध का विवरण",
+    platform: "मंच", uploadEvidence: "सबूत अपलोड करू", uploadId: "पहचान पत्र अपलोड करू",
+    submit: "शिकायत दर्ज करू", ticketId: "टिकट आईडी", trackStatus: "स्थिति ट्रैक करू", pending: "लंबित",
+    reviewing: "समीक्षा में", resolved: "समाधान हो गया", speakNow: "अब बोलू...", listening: "सुन रहल छी...",
+    cyberGuard: "साइबरगार्ड एआई", tagline: "राष्ट्रीय साइबर अपराध शिकायत प्रणाली", helpline: "हेल्पलाइन: 1930",
+    govIndia: "भारत सरकार", ministry: "गृह मंत्रालय", complaintForm: "शिकायत फॉर्म",
+    autoFilled: "एआई संभाषण द्वारा स्वतः भरा", aiAssistant: "एआई सहायक", selectItem: "चुनू...",
+    submitting: "जमा कऽ रहल छी...", complaintSuccess: "शिकायत सफलतापूर्वक दर्ज की गई", complaintRegistered: "अहाँक शिकायत दर्ज कऽ लेल गेल अछि।",
+    saveTicketId: "अपनी शिकायत की स्थिति ट्रैक करने के लिए इस टिकट आईडी को सहेजू।", evidenceHint: "ऑडियो, वीडियो, पीडीएफ, चित्र",
+    idHint: "आधार / पैन", conversationIn: "संभाषण भाषा", sorryError: "क्षमा करू, कुछ गलत हो गया। कृपया पुनः प्रयास करू।",
+    failedSubmit: "शिकायत दर्ज करने में विफल। कृपया पुनः प्रयास करू।", yourComplaintFiled: "अहाँक शिकायत दर्ज कऽ लेल गेल अछि। अहाँक टिकट आईडी : "
+  },
+  mni: {
+    language: "ꯂꯣꯟ", selectLanguage: "ꯅꯍꯥꯛꯀꯤ ꯂꯣꯟ ꯈꯜꯂꯨ", languagePrompt: "ꯅꯍꯥꯛꯄꯨ ꯀꯔꯤ ꯂꯣꯟ ꯊꯥꯖꯒꯨꯝ ꯃꯥꯏ? ꯊꯧꯔꯛ: ꯏꯉ꯭ꯂꯤꯖ, ꯍꯤꯟꯗꯤ, తెలుగు, ꯇꯥꯃꯤꯜ, ꯀꯟꯅꯦꯗ, ꯑꯦꯅꯥ ꯑꯃꯇꯨꯢ", languageSelected: "ꯈꯜꯂꯦ. ꯑꯩꯈꯣꯡꯗꯥ ꯀꯔꯤ ꯄꯨꯛ ꯄꯤꯡ ꯏꯞꯍꯥꯏ?", greeting: "ꯑꯩꯈꯣꯡꯗꯥ ꯀꯔꯤ ꯄꯨꯛ ꯄꯤꯡ ꯏꯞꯍꯥꯏ?", thinking: "ꯁꯩꯞꯂꯣꯟ ꯃꯥꯏ...", voiceOn: "ꯕꯧꯒꯝ ꯑꯦꯅ", waitingForLanguage: "ꯂꯣꯟꯗꯥ ꯀꯦꯄꯁꯥ",
+    fileComplaint: "ꯀꯨꯝꯄꯂꯩꯟ ꯊꯧꯔꯛꯎ", trackComplaint: "ꯀꯨꯝꯄꯂꯩꯟ ꯇ꯭ꯔꯦꯛ", home: "ꯌꯨꯝ", login: "ꯂꯦꯅꯖꯛ",
+    admin: "ꯑꯦꯗꯒꯨꯞ", profile: "ꯄ꯭ꯔꯣꯐꯥꯏꯜ", termsAndConditions: "ꯑꯣꯢꯕ ꯑꯃꯒꯤ", logout: "ꯂꯣꯒ ꯑꯥꯎꯠ",
+    fullName: "ꯃꯈꯧ ꯃꯤꯈꯤ", phone: "ꯄꯣꯟ ꯀꯉꯉ", email: "ꯑꯤ-ꯃꯦꯂ", address: "ꯃꯇꯧ",
+    incidentType: "ꯇꯧꯖꯦꯟ ꯄꯥꯛ", dateTime: "ꯇꯧꯖꯦꯟ ꯑꯩ ꯑꯃꯥ", description: "ꯃꯌꯥ",
+    amountLost: "ꯆꯠꯃꯤ ꯃꯞꯐꯁ", transactionId: "ꯇ꯭ꯔꯥꯟꯖꯦ ꯑꯀꯟꯇ ID / UTR", suspectDetails: "ꯂꯧꯈꯢ ꯃꯌꯥ",
+    platform: "ꯄ꯭ꯂꯦꯠꯐꯋꯔ꯫", uploadEvidence: "ꯃꯄꯨ ꯑꯦꯞꯂꯣꯢꯗ ꯀꯎ", uploadId: "ꯑꯥꯏꯕ ꯀꯜꯊ ꯑꯦꯞꯂꯣꯢꯗ ꯀꯎ",
+    submit: "ꯀꯨꯝꯄꯂꯩꯟ ꯊꯨꯕ", ticketId: "ꯇꯤꯀꯦꯊ ID", trackStatus: "ꯈ꯭ꯕꯥꯏ ꯇ꯭ꯔꯦꯛ ꯀꯎ", pending: "ꯈ꯭ꯕꯥꯏ",
+    reviewing: "ꯈ꯬ꯈꯤꯖꯝ", resolved: "ꯃꯜꯁꯤ", speakNow: "ꯇꯥ ꯂꯣꯢ...", listening: "ꯛꯀ ꯌꯨ...",
+    cyberGuard: "ꯁꯥꯏꯕꯔ ꯒꯥꯔ AI", tagline: "ꯌꯥꯎ ꯁꯥꯏꯕꯔ ꯇꯝꯕꯀ ꯀꯨꯝꯄꯂꯩꯟ ꯁꯤꯁ꯭ꯇꯦ꯫", helpline: "ꯃꯦꯟꯅꯛ ꯂꯧꯈꯢ 1930",
+    govIndia: "ꯊꯤꯒꯥꯏ ꯌꯨꯃ", ministry: "ꯃꯄꯩ ꯃꯇꯧ", complaintForm: "ꯀꯨꯝꯄꯂꯩꯟ ꯐꯣꯔꯝ",
+    autoFilled: "AI ꯆꯪꯂꯥꯢ ꯗꯥꯞꯇꯦ ꯀꯟꯅꯔꯥ", aiAssistant: "AI ꯃꯊ", selectItem: "ꯈꯜꯂꯨ...",
+    submitting: "ꯊꯨꯕꯦ ꯀꯨ...", complaintSuccess: "ꯀꯨꯝꯄꯂꯩꯟ ꯊꯦꯞꯄꯥ ꯑꯃꯕ", complaintRegistered: "ꯇꯉ꯭ꯄꯥ ꯀꯨꯝꯄꯂꯩꯟ ꯑꯅꯤ।",
+    saveTicketId: "ꯇꯉ꯭ꯄꯥ ꯀꯨꯝꯄꯂꯩꯟ ꯈ꯭ꯕꯥꯏ ꯇ꯭ꯔꯦꯛ ꯀꯁꯧ ꯇꯤꯀꯦꯊ ID ꯍꯨꯍꯜꯏ।", evidenceHint: "ꯑꯦꯠꯗꯤꯑꯣ, ꯋꯤꯈꯤꯑꯣ, PDF, ꯌꯨꯖꯤꯡ",
+    idHint: "ꯑꯥꯗꯦ / ꯄꯤ ꯑꯦ ꯑꯦꯟ", conversationIn: "ꯆꯪꯂꯥꯢ ꯂꯣꯟ", sorryError: "ꯖꯦꯟ ꯏ, ꯀꯠꯍꯦ ꯊꯪꯗꯥ।  ꯃꯐꯃ ꯄꯨꯛ ꯄꯤꯡ ꯏꯞꯍꯥꯏ।",
+    failedSubmit: "ꯀꯨꯝꯄꯂꯩꯟ ꯊꯨꯗꯨꯂꯤ ꯄꯣꯠꯄꯥ। ꯃꯐꯃ ꯄꯨꯛ ꯄꯤꯡ ꯏꯎ।", yourComplaintFiled: "ꯇꯉ꯭ꯄꯥ ꯀꯨꯝꯄꯂꯩꯟ ꯊꯦꯞꯄꯥ ꯑꯃꯕ। ꯇꯉ꯭ꯄꯥ ꯇꯤꯀꯦꯊ ID "
+  },
+  sa: {
+    language: "संस्कृतम्", selectLanguage: "कृपया स्वभाषां वृणुत", languagePrompt: "भवान् कां भाषां प्रयुञ्जते? उदाहरणार्थम्: अङ्ग्रेजी, हिन्दी, తెలుగు, तमिल, कन्नड, आदि", languageSelected: "वृणीतः। अहं भवन्तं कीदृशं साहाय्यं कर्तुं शक्नोमि?", greeting: "अहं भवन्तं कीदृशं साहाय्यं कर्तुं शक्नोमि?", thinking: "चिन्तयामि...", voiceOn: "स्वरः कृतः", waitingForLanguage: "भाषाया प्रतीक्षमाणः",
+    fileComplaint: "अभियोगं निबध्नुत", trackComplaint: "अभियोगं अनुगच्छत", home: "गृहम्", login: "प्रविशु",
+    admin: "प्रशासक:", profile: "प्रोफाइल", termsAndConditions: "नियम-शर्ते", logout: "निर्गच्छ",
+    fullName: "पूर्णनाम", phone: "भाषावाह्य-संख्या", email: "विद्युत्-पत्रम्", address: "इति-स्थान",
+    incidentType: "घटनाप्रकार", dateTime: "घटना-दिनाङ्क-समय:", description: "विवरणम्",
+    amountLost: "नष्ट-धन-क्षमता", transactionId: "व्यवहार-संख्या / UTR", suspectDetails: "संदिग्ध-विवरणम्",
+    platform: "प्लेटफॉर्म", uploadEvidence: "प्रमाण-संयोजनम्", uploadId: "पहचान-पत्र-संयोजनम्",
+    submit: "अभियोगं समर्पयत्", ticketId: "पत्र-संख्या", trackStatus: "स्थिति-अवलोकनम्", pending: "प्रतीक्षमान",
+    reviewing: "समीक्षणाधीन", resolved: "निरुद्धम्", speakNow: "अधुना वदत्...", listening: "श्रवणं करौ...",
+    cyberGuard: "साइबर-संरक्षक AI", tagline: "राष्ट्रीय साइबर-अपराध अभियोग-प्रणाली", helpline: "सहायता-वाणी: 1930",
+    govIndia: "भारत-सरकार", ministry: "गृह-मन्त्रालयम्", complaintForm: "अभियोग-नियोजनपत्र",
+    autoFilled: "AI-संभाषणात् स्वयं-भरितम्", aiAssistant: "AI-सहायक", selectItem: "वृणु...",
+    submitting: "समर्पणं क्रियते...", complaintSuccess: "अभियोगः सफलतया निबद्धः", complaintRegistered: "भवतः अभियोगः पञ्जीकृता भवतु।",
+    saveTicketId: "भवतः अभियोग-स्थितेः अवलोकनार्थं तदीयं पत्र-संख्या रक्षयत्।", evidenceHint: "श्रुति-संकेत, दृश्य-संकेत, PDF, प्रतिमानि",
+    idHint: "आधार / पैन", conversationIn: "संभाषण-भाषा", sorryError: "कृपयणा मा खेद्यत सर्वत्र कश्चन त्रुटिः।  कृपयणा पुनः प्रयन्तु।",
+    failedSubmit: "अभियोग-समर्पणे विफलताः।  कृपयणा पुनः प्रयन्तु।", yourComplaintFiled: "भवतः अभियोगः निबद्धाः पञ्जीकृतः।  भवतः पत्र-संख्या : "
+  },
+  sat: {
+    language: "ᱥᱟᱱᱛᱟᱲᱤ", selectLanguage: "ᱟᱢ ᱯᱟᱹᱨᱥᱤ ᱵᱟᱪᱷᱟᱣ ᱢᱮ", languagePrompt: "ᱟᱢ ᱟᱥᱳᱝ ᱯᱟᱹᱨᱥᱤ ᱨᱮ ᱨᱚᱨᱚ ᱠᱟᱹ? ᱢᱳᱦᱟᱨ: ᱤꯪᱞᱤᱡ, ᱦᱤᱱᱫᱤ, తెలుగు, ᱛᱟᱢᱤᱞ, ᱠᱟᱱᱟᱛᱟ, ᱮᱢᱟ ᱦᱚᱸ", languageSelected: "ᱨᱮᱡ ᱠᱟᱛᱮ. ᱚᱸ ᱟᱢᱟ ᱡᱚᱛᱚᱠᱷᱟᱱ ᱚᱰᱚ ᱜ ᱧᱟᱢ ᱠᱟᱛᱟ", greeting: "ᱚᱸ ᱟᱢᱟ ᱡᱚᱛᱚᱠᱷᱟᱱ ᱚᱰᱚ ᱜ ᱧᱟᱢ ᱠᱟᱛᱟ", thinking: "ᱤᱪᱮ ᱜ ᱞᱮᱠᱠᱟ...", voiceOn: "ᱠᱮᱪ ᱨᱮ", waitingForLanguage: "ᱯᱟᱹᱨᱥᱤ ᱨᱮᱠᱚ ᱞᱩᱣ",
+    fileComplaint: "ᱟᱨᱦᱤᱜ ᱫᱟᱣ", trackComplaint: "ᱟᱨᱦᱤ ꯇ꯭ꯔꯦꯛ", home: "ᱚᱲᱟᱜ", login: "ᱞᱚᱜ ᱤᱱ",
+    admin: "ᱚᱰᱢᱤᱱ", profile: "ᱯᱨᱚᱯᱷᱟꯏꯜ", termsAndConditions: "ᱥᱟᱯᱦᱤ ᱟᱨᱵᱟ ᱟᱸᱡᱚᱢ", logout: "ᱞᱚᱜ ᱚᱩᱴ",
+    fullName: "ᱯᱟᱹᱨᱟ ᱧᱩᱛᱩᱢ", phone: "ᱯᱷᱚᱱ ᱱᱚᱢᱵᱚᱨ", email: "ᱤ-ᱢᱮᱛᱟ", address: "ᱪᱩᱠᱩ",
+    incidentType: "ᱠᱟᱹᱦᱱᱤ ᱞᱮᱠᱟ", dateTime: "ᱠᱟᱹᱦᱱᱤ ᱟᱹᱦᱩ ᱟᱨ ᱥᱮᱨᱮᱧ", description: "ᱧᱩᱛᱩᱢ ᱨᱮᱧᱮᱫ",
+    amountLost: "ᱦᱟᱨᱟᱵᱽ ᱥᱚᱸᱠᱲᱟ", transactionId: "ᱠᱟᱢ-ᱵᱟ-ᱱᱤ ᱠᱚᱰ / UTR", suspectDetails: "ᱥᱩᱱᱩ ᱡᱚᱢᱟ ᱧᱩᱛᱩᱢ",
+    platform: "ᱯᱞᱮᱴᱚᱯᱷᱳᱨᱢ", uploadEvidence: "ᱯᱨᱚᱢᱚᱬ ᱚᱯ-ᱞᱚᱰ ᱢᱮ", uploadId: "ᱪᱤᱱᱦᱟᱹ ᱠᱟᱱ ᱞᱤᱞ ᱚᱯ-ᱞᱚᱰ ᱢᱮ",
+    submit: "ᱟᱨᱦᱤ ᱮᱢ ᱢᱮ", ticketId: "ᱜᱩᱞᱤ ᱱᱚᱢᱵᱚᱨ", trackStatus: "ᱞᱟᱮᱣ ᱠᱨᱮᱠ ᱢᱮ", pending: "ᱰᱷᱟᱠᱞᱞᱟ",
+    reviewing: "ᱵᱷᱚᱣᱭᱚ ᱠᱚᱢ", resolved: "ᱥᱟᱹᱛ ᱟᱹᱠᱟᱹ ᱠᱟᱛᱮ", speakNow: "ᱦᱚᱨᱚᱯ ᱰᱟᱠ...", listening: "ᱨᱚᱨᱯ ᱠᱚᱢ...",
+    cyberGuard: "ᱥᱟᱭᱵᱚᱨ ᱜᱟᱨᱰ ᱮᱭᱤ", tagline: "ᱨᱟᱦᱴᱟᱨᱤ ᱥᱟᱭᱵᱚᱨ ᱟᱯᱚᱨᱟᱫᱷ ᱟᱨᱦᱤ ᱞᱮᱠᱤᱟ", helpline: "ᱩᱫᱠᱥᱤ: 1930",
+    govIndia: "ᱤᱱᱨᱚᱠᱚ ᱠᱚᱞᱞᱷ", ministry: "ᱚᱵᱷᱤᱡᱚ-ᱭᱚᱱ", complaintForm: "ᱟᱨᱦᱤ ᱪᱷᱟᱣᱯᱥ",
+    autoFilled: "ᱮᱭᱤ ᱠᱷᱟ-ᱞᱚᱯᱟ ᱠᱷᱚᱵ-ᱠᱟᱠ", aiAssistant: "ᱮᱭᱤ ᱢᱚᱦᱟᱪ", selectItem: "ᱰᱟᱜ ᱢᱮ...",
+    submitting: "ᱫᱟᱭ ᱠᱚᱢ...", complaintSuccess: "ᱟᱨᱦᱤ ᱥᱟᱨᱟ ᱵᱚ ᱫᱟᱪ", complaintRegistered: "ᱟᱢ ᱟᱨᱦᱤ ᱥᱩᱪᱱᱟ ᱠᱟᱛᱮ ᱟᱠᱟ ᱢᱟ।",
+    saveTicketId: "ᱟᱢ ᱟᱨᱦᱤ ᱞᱟᱮᱣ ᱠᱨᱮᱠ ᱞᱮᱠϭ ᱜᱩᱞᱤ ᱠᱚᱰ ᱨᱚᱠ ᱢᱮ।", evidenceHint: "ᱚᱰᱤᱭᱚ, ᱵᱷᱤᱰᱤᱭᱚ, ᱯᱤᱯᱤᱮᱠᱚᱨ, ᱨᱩᱣᱟᱹ",
+    idHint: "ᱟᱫᱷᱟᱨ / ᱯᱮᱱ", conversationIn: "ᱞᱟᱯᱟᱛ ᱯᱟᱹᱨᱥᱤ", sorryError: "ᱠᱚᱱ, ᱠᱟᱹᱦᱱᱤ ᱵᱤᱭᱟ ᱠᱟᱛᱮ ᱨᱱ ᱯᱨᱚᱠ।",
+    failedSubmit: "ᱟᱨᱦᱤ ᱟᱵ ᱟᱹᱠᱚᱣᱞ। ᱪ.ᱩ. ᱯᱩᱱᱟᱮ ᱯᱨᱚ।", yourComplaintFiled: "ᱟᱢ ᱟᱨᱦᱤ ᱪᱩᱞᱳ ᱛᱟᱦᱮ ᱠᱚᱢ।  ᱟᱢ ᱜᱩᱞᱤ ᱠᱚᱰ : "
+  }
 };

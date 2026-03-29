@@ -1,41 +1,252 @@
-import { useLanguage } from "@/contexts/LanguageContext";
+import { LANGUAGES, useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FileText, Search, Mic, Phone, AlertTriangle, Users, Globe } from "lucide-react";
 import MicButton from "@/components/MicButton";
 import { useSpeechToText, useTextToSpeech } from "@/hooks/useSpeech";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
+import { sendChatMessage, resetChatSession, type ChatMessage } from "@/services/api";
 
 export default function HomePage() {
-  const { t, isLanguageSelected, language } = useLanguage();
-  const { isListening, transcript, startListening, stopListening } = useSpeechToText();
-  const { speak } = useTextToSpeech();
+  const { t, isLanguageSelected, language, setLanguage } = useLanguage();
+  const navigate = useNavigate();
+  const [voiceActive, setVoiceActive] = useState(false);
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
+  const [lastTranscript, setLastTranscript] = useState("");
+  const [assistantReply, setAssistantReply] = useState("");
+  const { speak, stop: stopSpeaking } = useTextToSpeech();
   const greetedRef = useRef(false);
   const [showTranscript, setShowTranscript] = useState(false);
+  const historyRef = useRef<ChatMessage[]>([]);
+  const voiceActiveRef = useRef(false);
+  const resumeListeningRef = useRef<(() => void) | null>(null);
+
+  // Ensure Home assistant starts a new backend session on each page load/refresh.
+  useEffect(() => {
+    resetChatSession();
+    historyRef.current = [];
+    setLastTranscript("");
+    setAssistantReply("");
+    setShowTranscript(false);
+  }, []);
+
+  const findLanguageFromSpeech = useCallback((rawText: string) => {
+    const normalized = rawText.trim().toLowerCase();
+    if (!normalized) return null;
+
+    const compact = normalized.replace(/\s+/g, "");
+    const languageAliases: Record<string, string[]> = {
+      en: ["english", "inglish", "en"],
+      hi: ["hindi", "hindhi", "hin", "हिंदी", "हिन्दी"],
+      te: ["telugu", "తెలుగు"],
+      ta: ["tamil", "தமிழ்"],
+      kn: ["kannada", "ಕನ್ನಡ"],
+      ml: ["malayalam", "മലയാളം"],
+      mr: ["marathi", "मराठी"],
+      bn: ["bengali", "bangla", "বাংলা"],
+      gu: ["gujarati", "ગુજરાતી"],
+      pa: ["punjabi", "ਪੰਜਾਬੀ"],
+      ur: ["urdu", "اردو"],
+      or: ["odia", "oriya", "ଓଡ଼ିଆ"],
+      as: ["assamese", "অসমীয়া"],
+      ne: ["nepali", "नेपाली"],
+      kok: ["konkani", "कोंकणी"],
+      ks: ["kashmiri", "कॉशुर"],
+      sa: ["sanskrit", "संस्कृतम्"],
+      sd: ["sindhi", "سنڌي"],
+      mai: ["maithili", "मैथिली"],
+      doi: ["dogri", "डोगरी"],
+      brx: ["bodo", "बड़ो"],
+      mni: ["manipuri", "meitei", "মৈতৈ"],
+      sat: ["santali", "ᱥᱟᱱᱛᱟᱲᱤ"],
+    };
+
+    for (const lang of LANGUAGES) {
+      const aliases = languageAliases[lang.code] || [];
+      const direct = [lang.name.toLowerCase(), lang.nativeName.toLowerCase(), ...aliases];
+      if (direct.some((item) => normalized.includes(item.toLowerCase()))) {
+        return lang;
+      }
+      if (direct.some((item) => compact.includes(item.toLowerCase().replace(/\s+/g, "")))) {
+        return lang;
+      }
+    }
+
+    return null;
+  }, []);
+
+  const maybeAutoSwitchLanguage = useCallback((text: string) => {
+    const detected = findLanguageFromSpeech(text);
+    if (!detected) return language;
+    if (language.code === "en" && detected.code !== "en") {
+      setLanguage(detected);
+      return detected;
+    }
+    return language;
+  }, [findLanguageFromSpeech, language, setLanguage]);
+
+  const localizeHomeAssistantReply = useCallback((raw: string, userText: string) => {
+    const text = (raw || "").trim();
+    if (!text) return t("sorryError");
+
+    const isGenericBackendFallback = /please continue and share your complaint details clearly\.?/i.test(text)
+      || /ai service is temporarily busy/i.test(text)
+      || /please share your full name|please share your 10-digit phone number|please share your email address|please share your complete address/i.test(text);
+
+    if (!isGenericBackendFallback) {
+      return text;
+    }
+
+    const wantsHelp = /(don't know|dont know|not sure|no idea|help|guide|explain|naaku teliyadu|naku teliyadu|teliyadu)/i.test(userText);
+    if (wantsHelp) {
+      if (language.code === "te") {
+        return "నేను మీకు దశలవారీగా సహాయం చేస్తాను. ఫిర్యాదు నమోదు చేయడానికి మీ పూర్తి పేరు, ఫోన్ నంబర్, ఇమెయిల్, చిరునామా, సంఘటన వివరాలు చెప్పండి.";
+      }
+      return `${t("greeting")} ${t("fileComplaint")}.`;
+    }
+
+    return t("greeting");
+  }, [language.code, t]);
+
+  const handleVoiceMessage = useCallback(async (text: string) => {
+    const cleaned = text.trim();
+    if (!cleaned) {
+      return;
+    }
+
+    const effectiveLanguage = maybeAutoSwitchLanguage(cleaned);
+
+    setLastTranscript(cleaned);
+    setShowTranscript(true);
+
+    if (!isLanguageSelected) {
+      const detected = findLanguageFromSpeech(cleaned);
+      if (!detected) {
+        const prompt = t("languagePrompt");
+        setAssistantReply(prompt);
+        speak(prompt, "en-IN", () => {
+          if (voiceActiveRef.current) {
+            resumeListeningRef.current?.();
+          }
+        });
+        return;
+      }
+
+      setLanguage(detected);
+      historyRef.current = [];
+      const selectedReply = `${detected.nativeName} ${t("languageSelected")}`;
+      setAssistantReply(selectedReply);
+      speak(selectedReply, detected.speechCode, () => {
+        if (voiceActiveRef.current) {
+          resumeListeningRef.current?.();
+        }
+      });
+      return;
+    }
+
+    if (/\b(hi|hello|hey|hii|helo|good morning|good evening|namaste|నమస్తే|నమస్కారం)\b/i.test(cleaned) && historyRef.current.length === 0) {
+      const greetReply = language.code === "en" ? "Hello! What can I do for you today?" : t("greeting");
+      setAssistantReply(greetReply);
+      speak(greetReply, effectiveLanguage.speechCode, () => {
+        if (voiceActiveRef.current) {
+          resumeListeningRef.current?.();
+        }
+      });
+      return;
+    }
+
+    // If user asks to file a complaint, move them directly to complaint workflow.
+    if (/(file|register|submit|raise)\s+.*(complaint|report)|\bcomplaint\b/i.test(cleaned)) {
+      speak(t("fileComplaint"), effectiveLanguage.speechCode, () => {
+        navigate("/complaint");
+      });
+      return;
+    }
+
+    const userMsg: ChatMessage = { role: "user", content: cleaned };
+    const nextMessages = [...historyRef.current, userMsg];
+    historyRef.current = nextMessages;
+
+    setIsProcessingVoice(true);
+    try {
+      const apiRes = await sendChatMessage(nextMessages, effectiveLanguage.name);
+      const reply = localizeHomeAssistantReply(apiRes.response || t("sorryError"), cleaned);
+      const assistantMsg: ChatMessage = { role: "assistant", content: reply };
+      historyRef.current = [...nextMessages, assistantMsg];
+      setAssistantReply(reply);
+      speak(reply, effectiveLanguage.speechCode, () => {
+        if (voiceActiveRef.current) {
+          resumeListeningRef.current?.();
+        }
+      });
+    } catch {
+      const fallback = t("sorryError");
+      setAssistantReply(fallback);
+      speak(fallback, effectiveLanguage.speechCode, () => {
+        if (voiceActiveRef.current) {
+          resumeListeningRef.current?.();
+        }
+      });
+    } finally {
+      setIsProcessingVoice(false);
+    }
+  }, [findLanguageFromSpeech, isLanguageSelected, navigate, setLanguage, speak, t, maybeAutoSwitchLanguage, language.code]);
+
+  const {
+    isListening,
+    startListening,
+    stopListening,
+    pauseListening,
+    resumeListening,
+  } = useSpeechToText(handleVoiceMessage);
+
+  useEffect(() => {
+    resumeListeningRef.current = resumeListening;
+  }, [resumeListening]);
+
+  useEffect(() => {
+    voiceActiveRef.current = voiceActive;
+  }, [voiceActive]);
 
   // Greet user when language is selected
   useEffect(() => {
     if (isLanguageSelected && !greetedRef.current) {
       greetedRef.current = true;
-      setTimeout(() => speak(t("greeting")), 500);
+      setTimeout(() => speak(t("greeting"), language.speechCode), 500);
     }
-  }, [isLanguageSelected, speak, t]);
+  }, [isLanguageSelected, language.speechCode, speak, t]);
 
   const toggleMic = () => {
-    if (isListening) {
+    if (voiceActive) {
+      setVoiceActive(false);
       stopListening();
-      setShowTranscript(true);
+      stopSpeaking();
     } else {
-      startListening();
+      setVoiceActive(true);
       setShowTranscript(false);
+      setAssistantReply("");
+
+      if (!isLanguageSelected) {
+        const prompt = t("languagePrompt");
+        setAssistantReply(prompt);
+        setShowTranscript(true);
+        // Avoid capturing the app's own prompt audio as user input.
+        pauseListening();
+        speak(prompt, language.speechCode, () => {
+          if (voiceActiveRef.current) resumeListeningRef.current?.();
+        });
+      } else {
+        startListening();
+      }
     }
   };
 
   const stats = [
-    { icon: FileText, value: "2.5L+", label: "Complaints Filed" },
-    { icon: Users, value: "1.8L+", label: "Cases Resolved" },
-    { icon: Globe, value: "23", label: "Languages Supported" },
-    { icon: Phone, value: "1930", label: "Helpline Number" },
+    { icon: FileText, value: "2.5L+", label: t("fileComplaint") },
+    { icon: Users, value: "1.8L+", label: t("resolved") },
+    { icon: Globe, value: "23", label: t("language") },
+    { icon: Phone, value: "1930", label: t("helpline") },
   ];
 
   return (
@@ -100,12 +311,12 @@ export default function HomePage() {
 
       {/* How It Works */}
       <section className="max-w-[1400px] mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-center mb-12 text-balance">How CyberGuard AI Works</h2>
+        <h2 className="text-2xl font-bold text-center mb-12 text-balance">{t("cyberGuard")}</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { step: "01", title: "Select Language", desc: "Choose from 22 official Indian languages. The AI will converse in your preferred language.", icon: Globe },
-            { step: "02", title: "Describe the Incident", desc: "Speak or type your complaint. Our AI assistant guides you through every step.", icon: Mic },
-            { step: "03", title: "Track & Resolve", desc: "Get a ticket ID. Track your complaint status in real-time in your language.", icon: Search },
+            { step: "01", title: t("selectLanguage"), desc: t("languagePrompt"), icon: Globe },
+            { step: "02", title: t("description"), desc: t("aiAssistant"), icon: Mic },
+            { step: "03", title: t("trackComplaint"), desc: t("trackStatus"), icon: Search },
           ].map((item, i) => (
             <div
               key={item.step}
@@ -122,28 +333,40 @@ export default function HomePage() {
       </section>
 
       {/* Voice Transcript Overlay */}
-      {showTranscript && transcript && (
+      {showTranscript && lastTranscript && (
         <div className="fixed bottom-28 right-8 max-w-sm bg-card rounded-xl shadow-2xl border border-border p-4 z-50 animate-reveal-up">
-          <p className="text-sm text-muted-foreground mb-1">{t("speakNow")}</p>
-          <p className="text-foreground font-medium">{transcript}</p>
+          <p className="text-sm text-muted-foreground mb-1">{t("description")}</p>
+          <p className="text-foreground font-medium">{lastTranscript}</p>
+          {(assistantReply || isProcessingVoice) && (
+            <>
+              <p className="text-sm text-muted-foreground mt-3 mb-1">{t("aiAssistant")}</p>
+              <p className="text-foreground font-medium">
+                {isProcessingVoice ? "..." : assistantReply}
+              </p>
+            </>
+          )}
           <button
             onClick={() => setShowTranscript(false)}
             className="text-xs text-accent mt-2 hover:underline"
           >
-            Dismiss
+            X
           </button>
         </div>
       )}
 
       {/* Floating Mic Button */}
       <div className="fixed bottom-8 right-8 z-50">
-        <MicButton isListening={isListening} onToggle={toggleMic} size="lg" />
-        {isListening && (
+        <MicButton isListening={voiceActive} onToggle={toggleMic} size="lg" />
+        {voiceActive && (
           <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-foreground text-background px-3 py-1 rounded-full">
-            {t("listening")}
+            {isListening ? t("listening") : isProcessingVoice ? t("thinking") : isLanguageSelected ? t("voiceOn") : t("waitingForLanguage")}
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function getTranslationLabel(_langCode: string, translated: string, fallback: string) {
+  return translated?.trim() ? translated : fallback;
 }

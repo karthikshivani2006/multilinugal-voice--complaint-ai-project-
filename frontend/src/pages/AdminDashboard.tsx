@@ -166,8 +166,11 @@ export default function AdminDashboard() {
                   <DetailRow icon={Mail} label="Email" value={selected.email} />
                   <DetailRow icon={Phone} label="Phone" value={selected.phone} />
                   <DetailRow icon={FileText} label="Type" value={selected.incidentType} />
+                  {selected.dateTime && <DetailRow icon={FileText} label="Incident Date/Time" value={selected.dateTime} />}
                   {selected.platform && <DetailRow icon={FileText} label="Platform" value={selected.platform} />}
                   {selected.amountLost && <DetailRow icon={FileText} label="Amount Lost" value={selected.amountLost} />}
+                  {selected.transactionId && <DetailRow icon={FileText} label="Transaction ID / UTR" value={selected.transactionId} />}
+                  {selected.suspectDetails && <DetailRow icon={FileText} label="Suspect Details" value={selected.suspectDetails} />}
                   {selected.suspectVpa && <DetailRow icon={FileText} label="Suspect VPA" value={selected.suspectVpa} />}
                   {selected.suspectPhone && <DetailRow icon={Phone} label="Suspect Phone" value={selected.suspectPhone} />}
                   {selected.suspectBankAccount && <DetailRow icon={FileText} label="Suspect Bank Account" value={selected.suspectBankAccount} />}
@@ -190,15 +193,26 @@ export default function AdminDashboard() {
                     <p className="text-xs text-muted-foreground mb-1">Evidence / Documents</p>
                     <div className="bg-muted/50 rounded-lg p-3 space-y-2">
                       {selected.evidenceFiles.map((file, idx) => (
-                        <a
-                          key={`${file.filePath}-${idx}`}
-                          href={file.fileUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="block text-sm text-accent hover:underline break-all"
-                        >
-                          Open Document {idx + 1}
-                        </a>
+                        <div key={`${file.filePath}-${idx}`} className="rounded-md border border-border bg-background p-2">
+                          <a
+                            href={file.fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block text-sm text-accent hover:underline break-all"
+                          >
+                            Open Document {idx + 1}
+                          </a>
+                          {file.extractedText && (
+                            <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap">
+                              Extracted (English): {file.extractedText}
+                            </p>
+                          )}
+                          {file.extractedTextOriginal && file.extractedTextOriginal !== file.extractedText && (
+                            <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap">
+                              Original Extracted Text: {file.extractedTextOriginal}
+                            </p>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>

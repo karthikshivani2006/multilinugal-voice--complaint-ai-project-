@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 import models  # noqa: F401
@@ -33,9 +34,15 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8080",
         "http://localhost:8081",
+        "http://localhost:8082",
+        "http://localhost:5173",
         "http://127.0.0.1:8080",
         "http://127.0.0.1:8081",
+        "http://127.0.0.1:8082",
+        "http://127.0.0.1:5173",
     ],
+    # Allow local dev origins on arbitrary ports (Vite, preview, static servers).
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +52,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    ensure_sqlite_columns()
     seed_admin()
 
 def health():
@@ -60,6 +68,27 @@ def seed_admin() -> None:
             db.commit()
     finally:
         db.close()
+
+
+def ensure_sqlite_columns() -> None:
+    if not str(settings.database_url).startswith("sqlite"):
+        return
+
+    required_columns = {
+        "suspect_vpa": "TEXT",
+        "suspect_phone": "TEXT",
+        "suspect_bank_account": "TEXT",
+    }
+
+    try:
+        with engine.begin() as conn:
+            rows = conn.execute(text("PRAGMA table_info(complaints)"))
+            existing = {row[1] for row in rows}
+            for col, col_type in required_columns.items():
+                if col not in existing:
+                    conn.exec_driver_sql(f"ALTER TABLE complaints ADD COLUMN {col} {col_type}")
+    except Exception as e:
+        print(f"SQLite schema patch skipped: {e}")
 
 
 @app.get("/")

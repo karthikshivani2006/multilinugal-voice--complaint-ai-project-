@@ -13,6 +13,7 @@ def ensure_upload_dirs() -> None:
 
 
 def save_upload_file(upload: UploadFile, sub_dir: str) -> str:
+    """Save upload file and return absolute path."""
     ensure_upload_dirs()
     safe_name = upload.filename or "file"
     extension = Path(safe_name).suffix
@@ -22,4 +23,20 @@ def save_upload_file(upload: UploadFile, sub_dir: str) -> str:
     with final_path.open("wb") as f:
         f.write(upload.file.read())
 
-    return str(final_path)
+    # Return absolute path for file operations
+    return str(final_path.resolve())
+
+
+def get_relative_file_path(absolute_path: str) -> str:
+    """Convert absolute path to relative path for serving via /uploads mount."""
+    # Extract the part after "uploads/" from the absolute path
+    # E.g., "/path/to/uploads/evidence/abc.pdf" -> "uploads/evidence/abc.pdf"
+    path_str = absolute_path.replace("\\", "/")
+    
+    # Find where "uploads/" starts
+    if "uploads/" in path_str:
+        idx = path_str.find("uploads/")
+        return path_str[idx:]
+    
+    # Fallback: return as-is if "uploads/" not found
+    return path_str
